@@ -1,4 +1,4 @@
-module server
+module github.com/Volkacid/smarthome
 
 go 1.19
 
