@@ -5540,11 +5540,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\duffe\\Desktop\\Csharp-Data-Visualization-main\\projects\\audio\\AudioVisualizer\\LEDVisualizer.csproj",
+      "projectUniqueName": "C:\\Users\\duffe\\Desktop\\smarthome\\audiovisualizer\\LEDVisualizer.csproj",
       "projectName": "LEDVisualizer",
-      "projectPath": "C:\\Users\\duffe\\Desktop\\Csharp-Data-Visualization-main\\projects\\audio\\AudioVisualizer\\LEDVisualizer.csproj",
+      "projectPath": "C:\\Users\\duffe\\Desktop\\smarthome\\audiovisualizer\\LEDVisualizer.csproj",
       "packagesPath": "C:\\Users\\duffe\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\duffe\\Desktop\\Csharp-Data-Visualization-main\\projects\\audio\\AudioVisualizer\\obj\\",
+      "outputPath": "C:\\Users\\duffe\\Desktop\\smarthome\\audiovisualizer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

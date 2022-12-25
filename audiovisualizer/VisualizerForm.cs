@@ -232,30 +232,38 @@ public partial class VisualizerForm : Form
         new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
     }
 
-    private void bedStaticRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (bedStaticRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _bedPort);
-            if (isSynchonizeActive)
-                toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _tablePort);
-        }
-    }
-
     private void manualControlBox_CheckedChanged(object sender, EventArgs e)
     {
         if (manualControlBox.Checked)
         {
             manualControl = true;
             bedBox.Enabled = true;
+            if (!synchronizeCheck.Checked)
+            {
+                tableBox.Enabled = true;
+            }
         } else
         {
             manualControl = false;
             bedBox.Enabled = false;
+            tableBox.Enabled = false;
+        }
+    }
+
+    private void synchronizeCheck_CheckedChanged(object sender, EventArgs e)
+    {
+        if (synchronizeCheck.Checked)
+        {
+            tableBox.Enabled = false;
+            isSynchonizeActive = true;
+        }
+        else
+        {
+            isSynchonizeActive = false;
+            if (manualControlBox.Checked)
+            {
+                tableBox.Enabled = true;
+            }
         }
     }
 
@@ -278,11 +286,49 @@ public partial class VisualizerForm : Form
         }
     }
 
-    private void synchronizeCheck_CheckedChanged(object sender, EventArgs e)
+    private void bedPulseRadio_CheckedChanged(object sender, EventArgs e)
     {
-        if (synchronizeCheck.Checked)
-            isSynchonizeActive = true;
-        else
-            isSynchonizeActive = false;
+
+    }
+
+    private void bedStaticRadio_CheckedChanged(object sender, EventArgs e)
+    {
+        if (bedStaticRadio.Checked && manualControl)
+        {
+            colorDialog1.FullOpen = true;
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            Color dialogColor = colorDialog1.Color;
+            toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _bedPort);
+            if (isSynchonizeActive)
+                toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _tablePort);
+        }
+    }
+
+    private void tableOverflowRadio_CheckedChanged(object sender, EventArgs e)
+    {
+        if (bedOverflowRadio.Checked && manualControl)
+        {
+            SerialPort[] _ports = new SerialPort[1];
+            _ports[0] = _tablePort;
+            effects.Overflow(_ports);
+        }
+    }
+
+    private void tablePulseRadio_CheckedChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void tableStaticRadio_CheckedChanged(object sender, EventArgs e)
+    {
+        if (tableStaticRadio.Checked && manualControl)
+        {
+            colorDialog1.FullOpen = true;
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            Color dialogColor = colorDialog1.Color;
+            toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _tablePort);
+        }
     }
 }

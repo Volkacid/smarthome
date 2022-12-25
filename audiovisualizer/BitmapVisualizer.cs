@@ -27,6 +27,9 @@ namespace LEDVisualizer
         bool automaticVerticalOffset = false;
         bool automaticHorizontalOffset = false;
 
+        const int heightPixels = 20;
+        const int widthPixels = 37;
+
         SerialPort _tablePort = new SerialPort();
         String comTable = "COM3";
 
@@ -45,27 +48,30 @@ namespace LEDVisualizer
             if (automaticVerticalOffset)
             {
                 verticalOffset = findVerticalOffset(captureBitmap);
-                verticalOffsetCheck.Text = "Вертикально: " + verticalOffset;
+                verticalOffsetCheck.Text = "Vertical: " + verticalOffset;
             }
             if (automaticHorizontalOffset)
             {
                 horizontalOffset = findHorizontalOffset(captureBitmap);
-                horizontalOffsetCheck.Text = "Горизонтально: " + horizontalOffset;
+                horizontalOffsetCheck.Text = "Horizontal: " + horizontalOffset;
             }
-
-            for (int index = 1; index <= 37; index++)
+            int screenWidth = captureBitmap.Width;
+            int screenHeight = captureBitmap.Height;
+            int widthStep = (screenWidth - 1) / widthPixels;
+            int heighStep = (screenHeight - 1) / heightPixels;
+            for (int index = 1; index <= widthPixels; index++)
             {
                 //currentColors[index + 56] = captureBitmap.GetPixel(index * 103, 0 + verticalOffset);
-                currentColors[index + 56] = CombineColors(captureBitmap.GetPixel((index * 103) - 1, 0 + verticalOffset), captureBitmap.GetPixel(index * 103, 0 + verticalOffset), captureBitmap.GetPixel((index * 103) + 1, 0 + verticalOffset));
+                currentColors[index + (heightPixels + widthPixels - 1)] = CombineColors(captureBitmap.GetPixel((index * widthStep) - 1, 0 + verticalOffset), captureBitmap.GetPixel(index * widthStep, 0 + verticalOffset), captureBitmap.GetPixel((index * widthStep) + 1, 0 + verticalOffset));
                 //currentColors[37 - index] = captureBitmap.GetPixel(index * 103, 2159 - verticalOffset);
-                currentColors[37 - index] = CombineColors(captureBitmap.GetPixel((index * 103) - 1, 2159 - verticalOffset), captureBitmap.GetPixel(index * 103, 2159 - verticalOffset), captureBitmap.GetPixel((index * 103) + 1, 2159 - verticalOffset));
+                currentColors[widthPixels - index] = CombineColors(captureBitmap.GetPixel((index * widthStep) - 1, screenHeight - 1 - verticalOffset), captureBitmap.GetPixel(index * widthStep, screenHeight - 1 - verticalOffset), captureBitmap.GetPixel((index * widthStep) + 1, screenHeight - 1 - verticalOffset));
             }
-            for (int index = 1; index <= 20; index++)
+            for (int index = 1; index <= heightPixels; index++)
             {
                 //currentColors[57 - index] = captureBitmap.GetPixel(0 + horizontalOffset, index * 107);
-                currentColors[57 - index] = CombineColors(captureBitmap.GetPixel(0 + horizontalOffset, (index * 107) - 1), captureBitmap.GetPixel(0 + horizontalOffset, index * 107), captureBitmap.GetPixel(0 + horizontalOffset, (index * 107) + 1));
+                currentColors[(heightPixels + widthPixels) - index] = CombineColors(captureBitmap.GetPixel(0 + horizontalOffset, (index * heighStep) - 1), captureBitmap.GetPixel(0 + horizontalOffset, index * heighStep), captureBitmap.GetPixel(0 + horizontalOffset, (index * heighStep) + 1));
                 //currentColors[93 + index] = captureBitmap.GetPixel(3839 - horizontalOffset, index * 107);
-                currentColors[93 + index] = CombineColors(captureBitmap.GetPixel(3839 - horizontalOffset, (index * 107) - 1), captureBitmap.GetPixel(3839 - horizontalOffset, index * 107), captureBitmap.GetPixel(3839 - horizontalOffset, (index * 107) + 1));
+                currentColors[(widthPixels * 2 + heightPixels - 1) + index] = CombineColors(captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, (index * heighStep) - 1), captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, index * heighStep), captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, (index * heighStep) + 1));
             }
 
             bool someChanged = false;
@@ -162,12 +168,17 @@ namespace LEDVisualizer
         {
             if (verticalOffsetCheck.Checked)
             {
+                manualOffsetBox.Enabled = false;
                 automaticVerticalOffset = true;
             } else
             {
                 automaticVerticalOffset = false;
                 verticalOffset = 0;
-                verticalOffsetCheck.Text = "Вертикально";
+                verticalOffsetCheck.Text = "Vertical";
+                if (!horizontalOffsetCheck.Checked)
+                {
+                    manualOffsetBox.Enabled = true;
+                }
             }
         }
 
@@ -175,12 +186,17 @@ namespace LEDVisualizer
         {
             if (horizontalOffsetCheck.Checked)
             {
+                manualOffsetBox.Enabled = false;
                 automaticHorizontalOffset = true;
             } else
             {
                 automaticHorizontalOffset = false;
                 horizontalOffset = 0;
-                horizontalOffsetCheck.Text = "Горизонтально";
+                horizontalOffsetCheck.Text = "Horizontal";
+                if (!verticalOffsetCheck.Checked)
+                {
+                    manualOffsetBox.Enabled = true;
+                }
             }
         }
 
@@ -190,6 +206,16 @@ namespace LEDVisualizer
             int finalGreen = (firstColor.G + secondColor.G + thirdColor.G) / 3;
             int finalBlue = (firstColor.B + secondColor.B + thirdColor.B) / 3;
             return Color.FromArgb(finalRed, finalGreen, finalBlue);
+        }
+
+        private void manVertOffsetBox_TextChanged(object sender, EventArgs e)
+        {
+            verticalOffset = int.Parse(manVertOffsetBox.Text);
+        }
+
+        private void horManOffsetBox_TextChanged(object sender, EventArgs e)
+        {
+            horizontalOffset = int.Parse(manHorOffsetBox.Text);
         }
     }
 }

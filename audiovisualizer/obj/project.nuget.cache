@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "plWEfJPD/pKKHE8gEF0IHTW4FkCnikbXEJc/5FVlhe0qNxz7Bgx98MKEuYCXEYvFxLz9IQ2ot4Bxe3RiM+sogg==",
+  "dgSpecHash": "b4VUuAxalYRnK0NJy/Gywwey00iSfUBTL82cjH9TsRyhHaOMwvRGXQkuUJNtpYRXXmzEt/1jYx+SEorY4lHJ4g==",
   "success": true,
-  "projectFilePath": "C:\\Users\\duffe\\Desktop\\Csharp-Data-Visualization-main\\projects\\audio\\AudioVisualizer\\LEDVisualizer.csproj",
+  "projectFilePath": "C:\\Users\\duffe\\Desktop\\smarthome\\audiovisualizer\\LEDVisualizer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\duffe\\.nuget\\packages\\fftsharp\\1.1.5\\fftsharp.1.1.5.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",

@@ -48,9 +48,13 @@
             this.peakLabel = new System.Windows.Forms.Label();
             this.inputBox = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
             this.manualControlBox = new System.Windows.Forms.CheckBox();
             this.synchronizeCheck = new System.Windows.Forms.CheckBox();
             this.tableBox = new System.Windows.Forms.GroupBox();
+            this.tableOverflowRadio = new System.Windows.Forms.RadioButton();
+            this.tablePulseRadio = new System.Windows.Forms.RadioButton();
+            this.tableStaticRadio = new System.Windows.Forms.RadioButton();
             this.bedBox = new System.Windows.Forms.GroupBox();
             this.bedOverflowRadio = new System.Windows.Forms.RadioButton();
             this.bedPulseRadio = new System.Windows.Forms.RadioButton();
@@ -61,6 +65,7 @@
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tableBox.SuspendLayout();
             this.bedBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -258,6 +263,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label1);
             this.tabPage2.Controls.Add(this.manualControlBox);
             this.tabPage2.Controls.Add(this.synchronizeCheck);
             this.tabPage2.Controls.Add(this.tableBox);
@@ -272,10 +278,19 @@
             this.tabPage2.Text = "Manual";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(19, 433);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(120, 25);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "Time elapsed:";
+            // 
             // manualControlBox
             // 
             this.manualControlBox.AutoSize = true;
-            this.manualControlBox.Location = new System.Drawing.Point(164, 434);
+            this.manualControlBox.Location = new System.Drawing.Point(273, 277);
             this.manualControlBox.Name = "manualControlBox";
             this.manualControlBox.Size = new System.Drawing.Size(96, 29);
             this.manualControlBox.TabIndex = 11;
@@ -286,7 +301,7 @@
             // synchronizeCheck
             // 
             this.synchronizeCheck.AutoSize = true;
-            this.synchronizeCheck.Location = new System.Drawing.Point(304, 433);
+            this.synchronizeCheck.Location = new System.Drawing.Point(400, 277);
             this.synchronizeCheck.Name = "synchronizeCheck";
             this.synchronizeCheck.Size = new System.Drawing.Size(132, 29);
             this.synchronizeCheck.TabIndex = 10;
@@ -296,12 +311,54 @@
             // 
             // tableBox
             // 
-            this.tableBox.Location = new System.Drawing.Point(400, 16);
+            this.tableBox.Controls.Add(this.tableOverflowRadio);
+            this.tableBox.Controls.Add(this.tablePulseRadio);
+            this.tableBox.Controls.Add(this.tableStaticRadio);
+            this.tableBox.Enabled = false;
+            this.tableBox.Location = new System.Drawing.Point(400, 88);
             this.tableBox.Name = "tableBox";
-            this.tableBox.Size = new System.Drawing.Size(370, 398);
+            this.tableBox.Size = new System.Drawing.Size(370, 167);
             this.tableBox.TabIndex = 9;
             this.tableBox.TabStop = false;
             this.tableBox.Text = "Table";
+            // 
+            // tableOverflowRadio
+            // 
+            this.tableOverflowRadio.AutoSize = true;
+            this.tableOverflowRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.tableOverflowRadio.Checked = true;
+            this.tableOverflowRadio.Location = new System.Drawing.Point(23, 41);
+            this.tableOverflowRadio.Name = "tableOverflowRadio";
+            this.tableOverflowRadio.Size = new System.Drawing.Size(109, 29);
+            this.tableOverflowRadio.TabIndex = 6;
+            this.tableOverflowRadio.TabStop = true;
+            this.tableOverflowRadio.Text = "Overflow";
+            this.tableOverflowRadio.UseVisualStyleBackColor = true;
+            this.tableOverflowRadio.CheckedChanged += new System.EventHandler(this.tableOverflowRadio_CheckedChanged);
+            // 
+            // tablePulseRadio
+            // 
+            this.tablePulseRadio.AutoSize = true;
+            this.tablePulseRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.tablePulseRadio.Location = new System.Drawing.Point(23, 76);
+            this.tablePulseRadio.Name = "tablePulseRadio";
+            this.tablePulseRadio.Size = new System.Drawing.Size(78, 29);
+            this.tablePulseRadio.TabIndex = 7;
+            this.tablePulseRadio.Text = "Pulse";
+            this.tablePulseRadio.UseVisualStyleBackColor = true;
+            this.tablePulseRadio.CheckedChanged += new System.EventHandler(this.tablePulseRadio_CheckedChanged);
+            // 
+            // tableStaticRadio
+            // 
+            this.tableStaticRadio.AutoSize = true;
+            this.tableStaticRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.tableStaticRadio.Location = new System.Drawing.Point(23, 111);
+            this.tableStaticRadio.Name = "tableStaticRadio";
+            this.tableStaticRadio.Size = new System.Drawing.Size(79, 29);
+            this.tableStaticRadio.TabIndex = 8;
+            this.tableStaticRadio.Text = "Static";
+            this.tableStaticRadio.UseVisualStyleBackColor = true;
+            this.tableStaticRadio.CheckedChanged += new System.EventHandler(this.tableStaticRadio_CheckedChanged);
             // 
             // bedBox
             // 
@@ -309,9 +366,9 @@
             this.bedBox.Controls.Add(this.bedPulseRadio);
             this.bedBox.Controls.Add(this.bedStaticRadio);
             this.bedBox.Enabled = false;
-            this.bedBox.Location = new System.Drawing.Point(19, 16);
+            this.bedBox.Location = new System.Drawing.Point(19, 88);
             this.bedBox.Name = "bedBox";
-            this.bedBox.Size = new System.Drawing.Size(350, 398);
+            this.bedBox.Size = new System.Drawing.Size(350, 167);
             this.bedBox.TabIndex = 8;
             this.bedBox.TabStop = false;
             this.bedBox.Text = "Bed";
@@ -340,6 +397,7 @@
             this.bedPulseRadio.TabIndex = 4;
             this.bedPulseRadio.Text = "Pulse";
             this.bedPulseRadio.UseVisualStyleBackColor = true;
+            this.bedPulseRadio.CheckedChanged += new System.EventHandler(this.bedPulseRadio_CheckedChanged);
             // 
             // bedStaticRadio
             // 
@@ -366,7 +424,7 @@
             // timeLabel
             // 
             this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(19, 429);
+            this.timeLabel.Location = new System.Drawing.Point(136, 434);
             this.timeLabel.Name = "timeLabel";
             this.timeLabel.Size = new System.Drawing.Size(59, 25);
             this.timeLabel.TabIndex = 6;
@@ -387,6 +445,8 @@
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tableBox.ResumeLayout(false);
+            this.tableBox.PerformLayout();
             this.bedBox.ResumeLayout(false);
             this.bedBox.PerformLayout();
             this.ResumeLayout(false);
@@ -423,5 +483,9 @@
         private CheckBox synchronizeCheck;
         private ColorDialog colorDialog1;
         private CheckBox manualControlBox;
+        private Label label1;
+        private RadioButton tableOverflowRadio;
+        private RadioButton tablePulseRadio;
+        private RadioButton tableStaticRadio;
     }
 }
