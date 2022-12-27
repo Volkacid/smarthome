@@ -19,10 +19,14 @@ public partial class VisualizerForm : Form
     readonly int ChannelCount = 1;
     readonly int BufferMilliseconds = 15; // increase this to increase frequency resolution
 
-    static String comBed = "COM4";
-    static String comTable = "COM5";
-    static SerialPort _bedPort = new SerialPort(comBed, 38400);
-    static SerialPort _tablePort = new SerialPort(comTable, 38400);
+    //static String comBed = "COM4";
+    //static String comTable = "COM5";
+    //static SerialPort _bedPort = new SerialPort(comBed, 38400);
+    //static SerialPort _tablePort = new SerialPort(comTable, 38400);
+
+    const int bedStripe = 1;
+    const int tableStripe = 2;
+    const int bothStripes = 0;
 
     CircularBuffer lowQueue;
     CircularBuffer midQueue;
@@ -34,7 +38,7 @@ public partial class VisualizerForm : Form
 
     string scheme = "RGB";
 
-    SerialWriter toSerial = new SerialWriter();
+    StripeWriter toStripe = new StripeWriter();
     ColorsCalculator calculator = new ColorsCalculator();
     LEDEffects effects = new LEDEffects();
 
@@ -129,8 +133,8 @@ public partial class VisualizerForm : Form
             highQueue.Enqueue(highPower);
             if (!manualControl)
             {
-                toSerial.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), _tablePort);
-                toSerial.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), _bedPort);
+                toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), bothStripes);
+                //toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), bedStripe);
             }
         }
 
@@ -193,8 +197,8 @@ public partial class VisualizerForm : Form
         {
             try
             {
-                _bedPort.Open();
-                _tablePort.Open();
+                //_bedPort.Open();
+                //_tablePort.Open();
                 connectButton.Text = "Disconnect";
                 isConnected = true;
             }
@@ -211,10 +215,11 @@ public partial class VisualizerForm : Form
             highColorGain = Int32.Parse(highGain.Text);
         } else
         {
-            toSerial.WithScheme(scheme, 0, 0, 0, _tablePort);
-            toSerial.WithScheme(scheme, 0, 0, 0, _bedPort);
-            _bedPort.Close();
-            _tablePort.Close();
+            //toSerial.WithScheme(scheme, 0, 0, 0, _tablePort);
+            //toSerial.WithScheme(scheme, 0, 0, 0, _bedPort);
+            toStripe.WithScheme(scheme, 0, 0, 0, bothStripes);
+            //_bedPort.Close();
+            //_tablePort.Close();
             connectButton.Text = "Connect";
             isConnected = false;
             lowLabel.Text = "Low";
@@ -225,10 +230,10 @@ public partial class VisualizerForm : Form
 
     private void BitmapForm_Click(object sender, EventArgs e)
     {
-        if (_tablePort.IsOpen)
+        /*if (_tablePort.IsOpen)
         {
             _tablePort.Close();
-        }
+        }*/
         new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
     }
 
@@ -269,7 +274,7 @@ public partial class VisualizerForm : Form
 
     private void bedOverflowRadio_CheckedChanged(object sender, EventArgs e)
     {
-        if (bedOverflowRadio.Checked && manualControl)
+        /*if (bedOverflowRadio.Checked && manualControl)
         {
             SerialPort[] _ports;
             if (synchronizeCheck.Checked)
@@ -283,7 +288,7 @@ public partial class VisualizerForm : Form
                 _ports[0] = _bedPort;
             }
             effects.Overflow(_ports);
-        }
+        }*/
     }
 
     private void bedPulseRadio_CheckedChanged(object sender, EventArgs e)
@@ -299,20 +304,20 @@ public partial class VisualizerForm : Form
             if (colorDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
             Color dialogColor = colorDialog1.Color;
-            toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _bedPort);
+            toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bedStripe);
             if (isSynchonizeActive)
-                toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _tablePort);
+                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe);
         }
     }
 
     private void tableOverflowRadio_CheckedChanged(object sender, EventArgs e)
     {
-        if (bedOverflowRadio.Checked && manualControl)
+        /*if (bedOverflowRadio.Checked && manualControl)
         {
             SerialPort[] _ports = new SerialPort[1];
             _ports[0] = _tablePort;
             effects.Overflow(_ports);
-        }
+        }*/
     }
 
     private void tablePulseRadio_CheckedChanged(object sender, EventArgs e)
@@ -328,7 +333,7 @@ public partial class VisualizerForm : Form
             if (colorDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
             Color dialogColor = colorDialog1.Color;
-            toSerial.Send(dialogColor.R, dialogColor.G, dialogColor.B, _tablePort);
+            toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe);
         }
     }
 }

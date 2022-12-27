@@ -10,7 +10,7 @@ namespace LEDVisualizer
 {
     internal class LEDEffects
     {
-        SerialWriter serialWriter = new SerialWriter();
+        StripeWriter serialWriter = new StripeWriter();
 
         Stopwatch overColorWatch = new Stopwatch();
         Stopwatch writerWatch = new Stopwatch();
@@ -32,7 +32,7 @@ namespace LEDVisualizer
 
         private void OverColor(Color startColor, Color finishColor, int smooth, SerialPort[] _ports)
         {
-            float tempRed = startColor.R;
+            /*float tempRed = startColor.R;
             float tempGreen = startColor.G;
             float tempBlue = startColor.B;
             float stepRed = (finishColor.R - startColor.R) / smooth;
@@ -44,12 +44,12 @@ namespace LEDVisualizer
                 tempBlue += stepBlue;
                 foreach (SerialPort _port in _ports)
                 {
-                    serialWriter.Send((int)tempRed, (int)tempGreen, (int)tempBlue, _port);
+                    serialWriter.SendUDP((int)tempRed, (int)tempGreen, (int)tempBlue, _port);
                 }
                 writerWatch.Start();
                 while (writerWatch.Elapsed.Milliseconds < smooth*2) { }
                 writerWatch.Reset();
-            }
+            }*/
         }
     }
 }

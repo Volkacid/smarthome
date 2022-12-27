@@ -14,8 +14,8 @@ func PostRGB(stripePorts *service.StripePorts) http.HandlerFunc {
 		body, _ := io.ReadAll(request.Body)
 		bodyStr := string(body)
 		fmt.Println(bodyStr)
+		recRed, recGreen, recBlue := findValues(bodyStr)
 		if strings.Contains(bodyStr, "Static") {
-			recRed, recGreen, recBlue := findValues(bodyStr)
 			serialData := make([]byte, 5)
 			serialData[0] = byte(251)
 			serialData[2] = byte(recRed)
@@ -23,6 +23,13 @@ func PostRGB(stripePorts *service.StripePorts) http.HandlerFunc {
 			serialData[4] = byte(recBlue)
 			stripePorts.WriteSerial(serialData)
 		}
+		if strings.Contains(bodyStr, "Pulse") {
+			stripePorts.EffectsPulse(recRed, recGreen, recBlue, service.BothStripes)
+		}
+		if strings.Contains(bodyStr, "Overflow") {
+			stripePorts.EffectsOverflow(recRed, recGreen, recBlue, service.BothStripes)
+		}
+		http.Redirect(writer, request, "/", http.StatusFound)
 	}
 }
 

@@ -16,7 +16,7 @@ func StartUDPService(stripePorts *StripePorts) {
 		if err != nil {
 			fmt.Println("UDP receiver error: ", err)
 		}
-		stripePorts.WriteSerial(udpData)
 		fmt.Println("UDP data: ", udpData)
+		stripePorts.WriteSerial(udpData)
 	}
 }

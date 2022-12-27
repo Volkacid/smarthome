@@ -22,7 +22,7 @@ func main() {
 		fmt.Printf("Found port: %v\n", port)
 	}
 	stripePorts := service.OpenStripePorts()
-	service.StartUDPService(stripePorts)
+	go service.StartUDPService(stripePorts)
 	defer stripePorts.CloseStripePorts()
 	router := chi.NewRouter()
 	router.Route("/", func(r chi.Router) {

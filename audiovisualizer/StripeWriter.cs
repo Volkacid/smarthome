@@ -7,47 +7,49 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-public class SerialWriter
+public class StripeWriter
 {
-    public void WithScheme(string scheme, int lowColor, int midColor, int highColor, SerialPort _stripPort)
+    public void WithScheme(string scheme, int lowColor, int midColor, int highColor, int stripe)
     {
         switch (scheme)
         {
             case "RGB":
-                Send(lowColor, midColor, highColor, _stripPort);
+                SendUDP(lowColor, midColor, highColor, stripe);
                 break;
             case "RBG":
-                Send(lowColor, highColor, midColor, _stripPort);
+                SendUDP(lowColor, highColor, midColor, stripe);
                 break;
             case "GRB":
-                Send(midColor, lowColor, highColor, _stripPort);
+                SendUDP(midColor, lowColor, highColor, stripe);
                 break;
             case "GBR":
-                Send(midColor, highColor, lowColor, _stripPort);
+                SendUDP(midColor, highColor, lowColor, stripe);
                 break;
             case "BRG":
-                Send(highColor, lowColor, midColor, _stripPort);
+                SendUDP(highColor, lowColor, midColor, stripe);
                 break;
             case "BGR":
-                Send(highColor, midColor, lowColor, _stripPort);
+                SendUDP(highColor, midColor, lowColor, stripe);
                 break;
         }
     }
 
-    public void Send(int lowColor, int midColor, int highColor, SerialPort _stripPort)
+    public void SendUDP(int lowColor, int midColor, int highColor, int stripe)
     {
         byte[] buf = new byte[5];
         buf[0] = (byte)251;
+        buf[1] = (byte)stripe;
         buf[2] = (byte)lowColor;
         buf[3] = (byte)midColor;
         buf[4] = (byte)highColor;
-        if (_stripPort.IsOpen == true)
+        /*if (_stripPort.IsOpen == true)
         {
             _stripPort.Write(buf, 0, 5);
-        }
+        }*/
+
         UdpClient RGBSender = new UdpClient();
-        //IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 45 });
-        IPAddress servAddr = new IPAddress(new byte[] { 127, 0, 0, 1 });
+        IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 45 });
+        //IPAddress servAddr = new IPAddress(new byte[] { 127, 0, 0, 1 });
         IPEndPoint endPoint = new IPEndPoint(servAddr, 5001);
         RGBSender.Send(buf, buf.Length, endPoint);
         RGBSender.Close();
