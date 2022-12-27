@@ -9,35 +9,35 @@ using System.Threading.Tasks;
 
 public class StripeWriter
 {
-    public void WithScheme(string scheme, int lowColor, int midColor, int highColor, int stripe)
+    public void WithScheme(string scheme, int lowColor, int midColor, int highColor, int stripe, int effectType)
     {
         switch (scheme)
         {
             case "RGB":
-                SendUDP(lowColor, midColor, highColor, stripe);
+                SendUDP(lowColor, midColor, highColor, stripe, effectType);
                 break;
             case "RBG":
-                SendUDP(lowColor, highColor, midColor, stripe);
+                SendUDP(lowColor, highColor, midColor, stripe, effectType);
                 break;
             case "GRB":
-                SendUDP(midColor, lowColor, highColor, stripe);
+                SendUDP(midColor, lowColor, highColor, stripe, effectType);
                 break;
             case "GBR":
-                SendUDP(midColor, highColor, lowColor, stripe);
+                SendUDP(midColor, highColor, lowColor, stripe, effectType);
                 break;
             case "BRG":
-                SendUDP(highColor, lowColor, midColor, stripe);
+                SendUDP(highColor, lowColor, midColor, stripe, effectType);
                 break;
             case "BGR":
-                SendUDP(highColor, midColor, lowColor, stripe);
+                SendUDP(highColor, midColor, lowColor, stripe, effectType);
                 break;
         }
     }
 
-    public void SendUDP(int lowColor, int midColor, int highColor, int stripe)
+    public void SendUDP(int lowColor, int midColor, int highColor, int stripe, int effectType)
     {
         byte[] buf = new byte[5];
-        buf[0] = (byte)251;
+        buf[0] = (byte)effectType;
         buf[1] = (byte)stripe;
         buf[2] = (byte)lowColor;
         buf[3] = (byte)midColor;
