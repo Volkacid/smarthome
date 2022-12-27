@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,6 +45,12 @@ public class SerialWriter
         {
             _stripPort.Write(buf, 0, 5);
         }
+        UdpClient RGBSender = new UdpClient();
+        //IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 45 });
+        IPAddress servAddr = new IPAddress(new byte[] { 127, 0, 0, 1 });
+        IPEndPoint endPoint = new IPEndPoint(servAddr, 5001);
+        RGBSender.Send(buf, buf.Length, endPoint);
+        RGBSender.Close();
     }
 
     public Color[] WithAmbilight(Color[] currentColors, Color[] previousColors, SerialPort _stripPort)
