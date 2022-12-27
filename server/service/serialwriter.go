@@ -20,11 +20,11 @@ type StripePorts struct {
 
 func OpenStripePorts() *StripePorts {
 	portMode := &serial.Mode{BaudRate: 38400}
-	bedPort, err := serial.Open("COM4", portMode)
+	bedPort, err := serial.Open("/dev/ttyUSB0", portMode)
 	if err != nil {
 		fmt.Println("Bed port error: ", err)
 	}
-	tablePort, err := serial.Open("COM5", portMode)
+	tablePort, err := serial.Open("/dev/ttyUSB1", portMode)
 	if err != nil {
 		fmt.Println("Table port error: ", err)
 	}
@@ -99,6 +99,7 @@ func (sp *StripePorts) EffectsColorTransition(colorFrom StripeColors, colorTo St
 		pulseData[2] = byte(int(math.Round(tempRed)))
 		pulseData[3] = byte(int(math.Round(tempGreen)))
 		pulseData[4] = byte(int(math.Round(tempBlue)))
+		fmt.Println(pulseData)
 		sp.WriteSerial(pulseData)
 		time.Sleep(delay)
 	}

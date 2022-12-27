@@ -17,6 +17,16 @@ func StartUDPService(stripePorts *StripePorts) {
 			fmt.Println("UDP receiver error: ", err)
 		}
 		fmt.Println("UDP data: ", udpData)
-		stripePorts.WriteSerial(udpData)
+		switch udpData[0] { //Arduino control byte
+		case 251:
+			stripePorts.WriteSerial(udpData)
+			break
+		case 250:
+			stripePorts.EffectsOverflow(int(udpData[2]), int(udpData[3]), int(udpData[4]), int(udpData[1]))
+			break
+		case 249:
+			stripePorts.EffectsPulse(int(udpData[2]), int(udpData[3]), int(udpData[4]), int(udpData[1]))
+			break
+		}
 	}
 }
