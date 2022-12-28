@@ -80,9 +80,6 @@ namespace LEDVisualizer
                 bitmap.UnlockBits(mapDest);
                 device.ImmediateContext.UnmapSubresource(screenTexture, 0);
 
-                // Save the output
-                //bitmap.Save("testscreenshoot.bmp");
-
                 screenResource.Dispose();
                 duplicatedOutput.ReleaseFrame();
 

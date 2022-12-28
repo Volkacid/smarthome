@@ -16,8 +16,6 @@ namespace LEDVisualizer
     {
         BitmapMaker bitmapMaker = new BitmapMaker();
 
-        //SerialWriter toSerial = new SerialWriter();
-
         Stopwatch programTime = new Stopwatch();
 
         Color[] currentColors = new Color[114];
@@ -31,6 +29,7 @@ namespace LEDVisualizer
         const int widthPixels = 37;
 
         SerialPort _tablePort = new SerialPort();
+        //change to your Arduino(BT_receiver_addrLED) port
         String comTable = "COM3";
 
         public BitmapVisualizer()
@@ -61,16 +60,12 @@ namespace LEDVisualizer
             int heighStep = (screenHeight - 1) / heightPixels;
             for (int index = 1; index <= widthPixels; index++)
             {
-                //currentColors[index + 56] = captureBitmap.GetPixel(index * 103, 0 + verticalOffset);
                 currentColors[index + (heightPixels + widthPixels - 1)] = CombineColors(captureBitmap.GetPixel((index * widthStep) - 1, 0 + verticalOffset), captureBitmap.GetPixel(index * widthStep, 0 + verticalOffset), captureBitmap.GetPixel((index * widthStep) + 1, 0 + verticalOffset));
-                //currentColors[37 - index] = captureBitmap.GetPixel(index * 103, 2159 - verticalOffset);
                 currentColors[widthPixels - index] = CombineColors(captureBitmap.GetPixel((index * widthStep) - 1, screenHeight - 1 - verticalOffset), captureBitmap.GetPixel(index * widthStep, screenHeight - 1 - verticalOffset), captureBitmap.GetPixel((index * widthStep) + 1, screenHeight - 1 - verticalOffset));
             }
             for (int index = 1; index <= heightPixels; index++)
             {
-                //currentColors[57 - index] = captureBitmap.GetPixel(0 + horizontalOffset, index * 107);
                 currentColors[(heightPixels + widthPixels) - index] = CombineColors(captureBitmap.GetPixel(0 + horizontalOffset, (index * heighStep) - 1), captureBitmap.GetPixel(0 + horizontalOffset, index * heighStep), captureBitmap.GetPixel(0 + horizontalOffset, (index * heighStep) + 1));
-                //currentColors[93 + index] = captureBitmap.GetPixel(3839 - horizontalOffset, index * 107);
                 currentColors[(widthPixels * 2 + heightPixels - 1) + index] = CombineColors(captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, (index * heighStep) - 1), captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, index * heighStep), captureBitmap.GetPixel(screenWidth - 1 - horizontalOffset, (index * heighStep) + 1));
             }
 
@@ -86,8 +81,13 @@ namespace LEDVisualizer
                     previousColors[i] = currentColors[i];
                     shortBuf[counter] = i;
                     counter++;
+                    //Updating color of 3 LEDs in one request because serial port is really slow
                     if (counter >= 3)
                     {
+                        //buf[0] is Arduino control byte:
+                        //255 to display changes on stripe
+                        //254 for batch of 3 colors(changes displayed automatically)
+                        //253 to fill stripe with single color
                         buf[0] = (byte)254;
                         buf[1] = (byte)shortBuf[0];
                         buf[2] = (byte)currentColors[shortBuf[0]].R;
@@ -104,29 +104,12 @@ namespace LEDVisualizer
                         _tablePort.Write(buf, 0, 13);
                         counter = 0;
                     }
-
-                    /*buf[1] = (byte)i;
-                    buf[2] = (byte)currentColors[i].R;
-                    buf[3] = (byte)currentColors[i].G;
-                    buf[4] = (byte)currentColors[i].B;*/
-                    //_serialPort.Write(buf, 0, 13);
-                    //Console.WriteLine(String.Join(" ", buf));
-
-                    //stopwatch.Start();
-                    //while (stopwatch.Elapsed.Milliseconds < 6) { }
-                    //stopwatch.Reset();
                 }
             }
             if (someChanged)
             {
-                //_serialPort.WriteLine("(X)");
-                //Console.WriteLine("(X)");
                 buf[0] = (byte)255;
                 _tablePort.Write(buf, 0, 13);
-                //Console.WriteLine(String.Join(" ", buf));
-                //stopwatch.Start();
-                //while (stopwatch.Elapsed.Milliseconds < 5) { }
-                //stopwatch.Reset();
                 someChanged = false;
             }
             timeLabel.Text = "" + programTime.ElapsedMilliseconds;
@@ -134,6 +117,7 @@ namespace LEDVisualizer
             programTime.Start();
         }
         
+        //Looking for a first non-black pixel at the top side of bitmap
         private int findVerticalOffset(Bitmap image)
         {
             int verticalOffset = 0;
@@ -149,6 +133,7 @@ namespace LEDVisualizer
             return verticalOffset + 5;
         }
 
+        //Looking for a first non-black pixel at the left side of bitmap
         private int findHorizontalOffset(Bitmap image)
         {
             int horizontalOffset = 0;
@@ -200,6 +185,7 @@ namespace LEDVisualizer
             }
         }
 
+        //CombineColors calculates the average color of adjacent pixels. This is necessary for smoothing 
         private Color CombineColors(Color firstColor, Color secondColor, Color thirdColor)
         {
             int finalRed = (firstColor.R + secondColor.R + thirdColor.R) / 3;

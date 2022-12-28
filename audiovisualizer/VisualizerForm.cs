@@ -19,11 +19,6 @@ public partial class VisualizerForm : Form
     readonly int ChannelCount = 1;
     readonly int BufferMilliseconds = 15; // increase this to increase frequency resolution
 
-    //static String comBed = "COM4";
-    //static String comTable = "COM5";
-    //static SerialPort _bedPort = new SerialPort(comBed, 38400);
-    //static SerialPort _tablePort = new SerialPort(comTable, 38400);
-
     const int bedStripe = 1;
     const int tableStripe = 2;
     const int bothStripes = 0;
@@ -43,7 +38,6 @@ public partial class VisualizerForm : Form
 
     StripeWriter toStripe = new StripeWriter();
     ColorsCalculator calculator = new ColorsCalculator();
-    LEDEffects effects = new LEDEffects();
 
     Stopwatch programTime = new Stopwatch();
 
@@ -137,7 +131,6 @@ public partial class VisualizerForm : Form
             if (!manualControl)
             {
                 toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), bothStripes, typeStatic);
-                //toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), bedStripe);
             }
         }
 
@@ -198,31 +191,22 @@ public partial class VisualizerForm : Form
     {
         if (connectButton.Text == "Connect")
         {
-            try
-            {
-                //_bedPort.Open();
-                //_tablePort.Open();
-                connectButton.Text = "Disconnect";
-                isConnected = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            connectButton.Text = "Disconnect";
+            isConnected = true;
+
+            //Smoothing
             int bufferSize = Int32.Parse(smoothBox.Text);
             lowQueue = new CircularBuffer(bufferSize);
             midQueue = new CircularBuffer(bufferSize);
             highQueue = new CircularBuffer(bufferSize);
+
+            //Gain
             lowColorGain = Int32.Parse(lowGain.Text);
             midColorGain = Int32.Parse(midGain.Text);
             highColorGain = Int32.Parse(highGain.Text);
         } else
         {
-            //toSerial.WithScheme(scheme, 0, 0, 0, _tablePort);
-            //toSerial.WithScheme(scheme, 0, 0, 0, _bedPort);
             toStripe.WithScheme(scheme, 0, 0, 0, bothStripes, typeStatic);
-            //_bedPort.Close();
-            //_tablePort.Close();
             connectButton.Text = "Connect";
             isConnected = false;
             lowLabel.Text = "Low";
@@ -233,13 +217,10 @@ public partial class VisualizerForm : Form
 
     private void BitmapForm_Click(object sender, EventArgs e)
     {
-        /*if (_tablePort.IsOpen)
-        {
-            _tablePort.Close();
-        }*/
         new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
     }
 
+    //manualControl takes control of stripes from automatic mode
     private void manualControlBox_CheckedChanged(object sender, EventArgs e)
     {
         if (manualControlBox.Checked)
@@ -258,6 +239,7 @@ public partial class VisualizerForm : Form
         }
     }
 
+    //Synchronize option controls both stripes as one
     private void synchronizeCheck_CheckedChanged(object sender, EventArgs e)
     {
         if (synchronizeCheck.Checked)
@@ -274,6 +256,8 @@ public partial class VisualizerForm : Form
             }
         }
     }
+
+    //Effects for manual control
 
     private void bedOverflowRadio_CheckedChanged(object sender, EventArgs e)
     {

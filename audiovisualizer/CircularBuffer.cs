@@ -1,5 +1,6 @@
 ﻿using System;
 
+//CircularBuffer stores last color values and caltulates average value. It is necessary for smoothing
 public class CircularBuffer
 {
     int[] _buffer;
