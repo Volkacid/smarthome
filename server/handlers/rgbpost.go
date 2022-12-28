@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"github.com/Volkacid/smarthome/service"
 	"io"
@@ -9,8 +10,9 @@ import (
 	"strings"
 )
 
-func PostRGB(stripePorts *service.StripePorts) http.HandlerFunc {
+func PostRGB(stripePorts *service.StripePorts, ctx context.Context, cancel context.CancelFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
+		cancel()
 		body, _ := io.ReadAll(request.Body)
 		bodyStr := string(body)
 		fmt.Println(bodyStr)
@@ -24,10 +26,12 @@ func PostRGB(stripePorts *service.StripePorts) http.HandlerFunc {
 			stripePorts.WriteSerial(serialData)
 		}
 		if strings.Contains(bodyStr, "Pulse") {
-			stripePorts.EffectsPulse(recRed, recGreen, recBlue, service.BothStripes)
+			ctx, cancel = context.WithCancel(context.Background())
+			go stripePorts.EffectsPulse(recRed, recGreen, recBlue, service.BothStripes, ctx)
 		}
 		if strings.Contains(bodyStr, "Overflow") {
-			stripePorts.EffectsOverflow(recRed, recGreen, recBlue, service.BothStripes)
+			ctx, cancel = context.WithCancel(context.Background())
+			go stripePorts.EffectsOverflow(recRed, recGreen, recBlue, service.BothStripes, ctx)
 		}
 		http.Redirect(writer, request, "/", http.StatusFound)
 	}

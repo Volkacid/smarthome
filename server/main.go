@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/Volkacid/smarthome/handlers"
 	"github.com/Volkacid/smarthome/service"
@@ -24,10 +25,11 @@ func main() {
 	stripePorts := service.OpenStripePorts()
 	go service.StartUDPService(stripePorts)
 	defer stripePorts.CloseStripePorts()
+	ctx, cancel := context.WithCancel(context.Background())
 	router := chi.NewRouter()
 	router.Route("/", func(r chi.Router) {
 		router.Get("/", handlers.MainPage)
-		router.Post("/", handlers.PostRGB(stripePorts))
+		router.Post("/", handlers.PostRGB(stripePorts, ctx, cancel))
 	})
 	log.Fatal(http.ListenAndServe(":80", router))
 }
