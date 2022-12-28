@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 )
 
 func StartUDPService(stripePorts *StripePorts) {
@@ -20,6 +21,7 @@ func StartUDPService(stripePorts *StripePorts) {
 		}
 		fmt.Println("UDP data: ", udpData)
 		cancel()
+		time.Sleep(300 * time.Millisecond)
 		switch udpData[0] { //Arduino control byte
 		case 251:
 			ctx, cancel = context.WithCancel(context.Background())
