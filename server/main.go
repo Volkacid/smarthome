@@ -25,7 +25,7 @@ func main() {
 	stripePorts := service.OpenStripePorts()
 	go service.StartUDPService(stripePorts)
 	defer stripePorts.CloseStripePorts()
-	alarmService := service.StartAlarmService(15, 15, stripePorts)
+	alarmService := service.StartAlarmService(9, 15, stripePorts)
 	defer alarmService.StopAlarmService()
 	ctx, cancel := context.WithCancel(context.Background())
 	router := chi.NewRouter()
