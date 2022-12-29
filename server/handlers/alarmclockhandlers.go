@@ -67,7 +67,7 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
     <option value="55">55</option>
 </select>
     <div>
-      ________________________
+      __________________
     <div>
     <input type="submit" value="Submit" name="alarmSubmit"> <input type="submit" value="Stop Alarm" name="alarmStop">
   </form>
@@ -94,7 +94,7 @@ func SetAlarm(alarmService *service.AlarmClock, stripePorts *service.StripePorts
 				return
 			}
 			alarmService.StopAlarmService()
-			alarmService = service.StartAlarmService(alHourInt, alMinInt, stripePorts)
+			*alarmService = *service.StartAlarmService(alHourInt, alMinInt, stripePorts)
 		}
 		if strings.Contains(bodyStr, "alarmStop") {
 			alarmService.AlHour = 0

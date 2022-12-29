@@ -24,6 +24,7 @@ func main() {
 	}
 	stripePorts := service.OpenStripePorts()
 	go service.StartUDPService(stripePorts)
+	fmt.Println("UDP service started")
 	defer stripePorts.CloseStripePorts()
 	alarmService := service.StartAlarmService(9, 15, stripePorts)
 	defer alarmService.StopAlarmService()
