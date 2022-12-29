@@ -1,14 +1,16 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/Volkacid/smarthome/service"
+	"io"
 	"net/http"
 )
 
 func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var alarmHead = `<p><b>Alarm clock settings</b></p>
-						<p><b>Current alarm:</b></p>`
+						<p>Current alarm:</p>`
 		writer.Write([]byte(alarmHead))
 		alarmTime := alarmService.GetAlarmTime()
 		if alarmTime == "0:0" {
@@ -16,7 +18,7 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
 		} else {
 			writer.Write([]byte(alarmTime))
 		}
-		var alarmSettings = `<p><b>Set up new alarm:</b></p>
+		var alarmSettings = `<p>Set up new alarm:</p>
 <div>
   <form method="post">
     <select name="alarmHours" id="alarmHours">
@@ -51,5 +53,13 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
   </form>
 </div>`
 		writer.Write([]byte(alarmSettings))
+	}
+}
+
+func SetAlarm(alarmService *service.AlarmClock) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		body, _ := io.ReadAll(request.Body)
+		bodyStr := string(body)
+		fmt.Println(bodyStr)
 	}
 }

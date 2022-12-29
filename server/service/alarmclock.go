@@ -43,7 +43,10 @@ func (ac *AlarmClock) timeChecker() {
 }
 
 func (ac *AlarmClock) GetAlarmTime() string {
-	return string(ac.alHour) + ":" + string(ac.alMin)
+	alarmTime := ""
+	alarmTime += string(ac.alHour) + ":"
+	alarmTime += string(ac.alMin)
+	return alarmTime
 }
 
 func (ac *AlarmClock) SetAlarmTime(alHour int, alMin int) {

@@ -33,6 +33,7 @@ func main() {
 		router.Get("/", handlers.MainPage(alarmService))
 		router.Post("/", handlers.PostRGB(stripePorts, ctx, cancel))
 		router.Get("/alarm", handlers.AlarmClockPage(alarmService))
+		router.Post("/alarm", handlers.SetAlarm(alarmService))
 	})
 	log.Fatal(http.ListenAndServe(":80", router))
 }
