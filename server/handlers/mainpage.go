@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/Volkacid/smarthome/service"
 	"net/http"
-	"strconv"
 )
 
 func MainPage(alarmService *service.AlarmClock) http.HandlerFunc {
@@ -22,8 +21,8 @@ func MainPage(alarmService *service.AlarmClock) http.HandlerFunc {
 		writer.Write([]byte(rgbControl))
 		var alarmHead = `<p><b>Current alarm:</b></p>`
 		writer.Write([]byte(alarmHead))
-		alarmTime := strconv.Itoa(alarmService.AlHour) + ":" + strconv.Itoa(alarmService.AlMin)
-		if alarmTime == "0:0" {
+		alarmTime := alarmService.GetAlarmTime()
+		if alarmTime == "00:00" {
 			writer.Write([]byte("Alarm stopped"))
 		} else {
 			writer.Write([]byte(alarmTime))

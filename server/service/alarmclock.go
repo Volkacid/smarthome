@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -44,4 +45,17 @@ func (ac *AlarmClock) timeChecker() {
 			time.Sleep(1 * time.Minute)
 		}
 	}
+}
+
+func (ac *AlarmClock) GetAlarmTime() string {
+	alarmTime := ""
+	if ac.AlHour < 10 {
+		alarmTime += "0"
+	}
+	alarmTime += strconv.Itoa(ac.AlHour) + ":"
+	if ac.AlMin < 10 {
+		alarmTime += "0"
+	}
+	alarmTime += strconv.Itoa(ac.AlMin)
+	return alarmTime
 }
