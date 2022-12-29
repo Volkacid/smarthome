@@ -97,6 +97,8 @@ func SetAlarm(alarmService *service.AlarmClock, stripePorts *service.StripePorts
 			alarmService = service.StartAlarmService(alHourInt, alMinInt, stripePorts)
 		}
 		if strings.Contains(bodyStr, "alarmStop") {
+			alarmService.AlHour = 0
+			alarmService.AlMin = 0
 			alarmService.StopAlarmService()
 			fmt.Println("Alarm service stopped")
 		}
