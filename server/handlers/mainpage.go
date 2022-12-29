@@ -1,9 +1,13 @@
 package handlers
 
-import "net/http"
+import (
+	"github.com/Volkacid/smarthome/service"
+	"net/http"
+)
 
-func MainPage(writer http.ResponseWriter, request *http.Request) {
-	var rgbControl = `
+func MainPage(alarmService *service.AlarmClock) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		var rgbControl = `
 <p><b>LED stripe settings:</b></p>
 <div>
  <form method="post">
@@ -14,6 +18,14 @@ func MainPage(writer http.ResponseWriter, request *http.Request) {
  </form>
 </div>
 `
-	writer.Write([]byte(rgbControl))
-	writer.Write([]byte("somestring"))
+		writer.Write([]byte(rgbControl))
+		var alarmHead = `<p><b>Current alarm:</b></p>`
+		writer.Write([]byte(alarmHead))
+		alarmTime := alarmService.GetAlarmTime()
+		if alarmTime == "0:0" {
+			writer.Write([]byte("Alarm stopped"))
+		} else {
+			writer.Write([]byte(alarmTime))
+		}
+	}
 }

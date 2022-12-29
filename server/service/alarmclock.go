@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -33,9 +34,19 @@ func (ac *AlarmClock) timeChecker() {
 			curHour, curMin, _ := time.Now().Clock()
 			if curHour == ac.alHour && (curMin-ac.alMin) >= 0 {
 				go ac.ports.EffectsAlarm(ac.ctx)
+				fmt.Println("Alarm clock!")
 				time.Sleep(1 * time.Hour)
 			}
 			time.Sleep(1 * time.Minute)
 		}
 	}
+}
+
+func (ac *AlarmClock) GetAlarmTime() string {
+	return string(ac.alHour) + ":" + string(ac.alMin)
+}
+
+func (ac *AlarmClock) SetAlarmTime(alHour int, alMin int) {
+	ac.alHour = alHour
+	ac.alMin = alMin
 }
