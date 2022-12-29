@@ -81,7 +81,7 @@ namespace LEDVisualizer
                     previousColors[i] = currentColors[i];
                     shortBuf[counter] = i;
                     counter++;
-                    //Updating color of 3 LEDs in one request because serial port is really slow
+                    //Updating color of 3 LEDs in one request because some BT modules are really slow
                     if (counter >= 3)
                     {
                         //buf[0] is Arduino control byte:
