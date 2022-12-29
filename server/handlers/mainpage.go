@@ -21,7 +21,7 @@ func MainPage(alarmService *service.AlarmClock) http.HandlerFunc {
 		writer.Write([]byte(rgbControl))
 		var alarmHead = `<p><b>Current alarm:</b></p>`
 		writer.Write([]byte(alarmHead))
-		alarmTime := alarmService.GetAlarmTime()
+		alarmTime := service.GetAlarmTime(alarmService)
 		if alarmTime == "0:0" {
 			writer.Write([]byte("Alarm stopped"))
 		} else {
