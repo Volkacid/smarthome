@@ -18,6 +18,7 @@ func StartAlarmService(alHour int, alMin int, stripePorts *StripePorts) *AlarmCl
 	ctx, cancel := context.WithCancel(context.Background())
 	alarmClock := &AlarmClock{alHour: alHour, alMin: alMin, ports: stripePorts, ctx: ctx, cancel: cancel}
 	go alarmClock.timeChecker()
+	fmt.Sprintf("Setting up alarm service on %v:%v", alHour, alMin)
 	return alarmClock
 }
 
@@ -44,8 +45,9 @@ func (ac *AlarmClock) timeChecker() {
 
 func (ac *AlarmClock) GetAlarmTime() string {
 	alarmTime := ""
-	alarmTime += string(ac.alHour) + ":"
-	alarmTime += string(ac.alMin)
+	alarmTime += string(rune(ac.alHour)) + ":"
+	alarmTime += string(rune(ac.alMin))
+	fmt.Println(alarmTime)
 	return alarmTime
 }
 

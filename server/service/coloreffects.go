@@ -55,8 +55,8 @@ func (sp *StripePorts) EffectsAlarm(ctx context.Context) {
 	alarmColors[0] = StripeColors{0, 0, 0}
 	alarmColors[1] = StripeColors{255, 255, 0}
 	alarmColors[1] = StripeColors{255, 255, 255}
-	sp.EffectsColorTransition(alarmColors[0], alarmColors[1], 255, 1*time.Millisecond, BothStripes, ctx)
-	sp.EffectsColorTransition(alarmColors[1], alarmColors[2], 255, 1*time.Millisecond, BothStripes, ctx)
+	sp.EffectsColorTransition(alarmColors[0], alarmColors[1], 255, 1*time.Second, BothStripes, ctx)
+	sp.EffectsColorTransition(alarmColors[1], alarmColors[2], 255, 1*time.Second, BothStripes, ctx)
 }
 
 func (sp *StripePorts) EffectsColorTransition(colorFrom StripeColors, colorTo StripeColors, steps int, delay time.Duration, stripe int, ctx context.Context) {

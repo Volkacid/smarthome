@@ -5,6 +5,8 @@ import (
 	"github.com/Volkacid/smarthome/service"
 	"io"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
@@ -56,10 +58,30 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
 	}
 }
 
-func SetAlarm(alarmService *service.AlarmClock) http.HandlerFunc {
+func SetAlarm(alarmService *service.AlarmClock, stripePorts *service.StripePorts) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		body, _ := io.ReadAll(request.Body)
 		bodyStr := string(body)
-		fmt.Println(bodyStr)
+		if strings.Contains(bodyStr, "alarmSubmit") {
+			_, alHour, _ := strings.Cut(bodyStr, "alarmHours=")
+			alHour, _, _ = strings.Cut(alHour, "&")
+			_, alMin, _ := strings.Cut(bodyStr, "alarmMinutes=")
+			alMin, _, _ = strings.Cut(alMin, "&")
+			alHourInt, err := strconv.Atoi(alHour)
+			if err != nil {
+				return
+			}
+			alMinInt, err := strconv.Atoi(alMin)
+			if err != nil {
+				return
+			}
+			alarmService.StopAlarmService()
+			alarmService = service.StartAlarmService(alHourInt, alMinInt, stripePorts)
+		}
+		if strings.Contains(bodyStr, "alarmStop") {
+			alarmService.StopAlarmService()
+			fmt.Println("Alarm service stopped")
+		}
+		http.Redirect(writer, request, "/alarm", http.StatusFound)
 	}
 }
