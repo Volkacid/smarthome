@@ -7,8 +7,8 @@ import (
 )
 
 type AlarmClock struct {
-	alHour int
-	alMin  int
+	AlHour int
+	AlMin  int
 	ports  *StripePorts
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -16,14 +16,17 @@ type AlarmClock struct {
 
 func StartAlarmService(alHour int, alMin int, stripePorts *StripePorts) *AlarmClock {
 	ctx, cancel := context.WithCancel(context.Background())
-	alarmClock := &AlarmClock{alHour: alHour, alMin: alMin, ports: stripePorts, ctx: ctx, cancel: cancel}
+	alarmClock := &AlarmClock{AlHour: alHour, AlMin: alMin, ports: stripePorts, ctx: ctx, cancel: cancel}
 	go alarmClock.timeChecker()
-	fmt.Printf("Setting up alarm service on %v:%v", alHour, alMin)
+	fmt.Printf("Setting up alarm service on %v:%v \n", alHour, alMin)
 	return alarmClock
 }
 
 func (ac *AlarmClock) StopAlarmService() {
 	ac.cancel()
+	data := make([]byte, 5)
+	data[0] = 251
+	ac.ports.WriteSerial(data)
 }
 
 func (ac *AlarmClock) timeChecker() {
@@ -33,7 +36,7 @@ func (ac *AlarmClock) timeChecker() {
 			return
 		default:
 			curHour, curMin, _ := time.Now().Clock()
-			if curHour == ac.alHour && (curMin-ac.alMin) >= 0 {
+			if curHour == ac.AlHour && (curMin-ac.AlMin) >= 0 {
 				go ac.ports.EffectsAlarm(ac.ctx)
 				fmt.Println("Alarm clock!")
 				time.Sleep(1 * time.Hour)
@@ -41,15 +44,4 @@ func (ac *AlarmClock) timeChecker() {
 			time.Sleep(1 * time.Minute)
 		}
 	}
-}
-
-func GetAlarmTime(ac *AlarmClock) string {
-	alarmTime := string(rune(ac.alHour)) + ":" + string(rune(ac.alMin))
-	fmt.Println(alarmTime)
-	return alarmTime
-}
-
-func (ac *AlarmClock) SetAlarmTime(alHour int, alMin int) {
-	ac.alHour = alHour
-	ac.alMin = alMin
 }

@@ -15,7 +15,8 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
 						<p>Current alarm:</p>`
 		writer.Write([]byte(alarmHead))
 
-		alarmTime := service.GetAlarmTime(alarmService)
+		alarmTime := strconv.Itoa(alarmService.AlHour) + ":" + strconv.Itoa(alarmService.AlMin)
+		strconv.Itoa(alarmService.AlHour)
 		if alarmTime == "0:0" {
 			writer.Write([]byte("Alarm stopped"))
 		} else {
