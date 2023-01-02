@@ -22,7 +22,7 @@ type ControlPorts struct {
 
 func OpenStripePorts() *StripePorts {
 	portMode := &serial.Mode{BaudRate: 38400}
-	bedPort, err := serial.Open("/dev/ttyUSB2", portMode)
+	bedPort, err := serial.Open("/dev/ttyUSB1", portMode)
 	if err != nil {
 		fmt.Println("Bed port error: ", err)
 	}
@@ -57,7 +57,7 @@ func (sp *StripePorts) WriteStripe(data []byte) {
 
 func OpenControlPorts() *ControlPorts {
 	portMode := &serial.Mode{BaudRate: 38400}
-	climatePort, err := serial.Open("/dev/ttyUSB1", portMode)
+	climatePort, err := serial.Open("/dev/ttyUSB2", portMode)
 	if err != nil {
 		fmt.Println("Climate port error: ", err)
 	}
@@ -69,11 +69,13 @@ func (cp *ControlPorts) CloseControlPorts() {
 }
 
 func (cp *ControlPorts) ReadSerial() {
-	buf := make([]byte, 30)
-	n, err := cp.climatePort.Read(buf)
-	if err != nil {
-		fmt.Println("Climate port reading error: ", err)
-		return
+	for {
+		buf := make([]byte, 30)
+		n, err := cp.climatePort.Read(buf)
+		if err != nil {
+			fmt.Println("Climate port reading error: ", err)
+			return
+		}
+		fmt.Println(string(buf[:n]))
 	}
-	fmt.Println(string(buf[:n]))
 }
