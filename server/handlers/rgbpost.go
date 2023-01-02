@@ -23,7 +23,7 @@ func PostRGB(stripePorts *service.StripePorts, ctx context.Context, cancel conte
 			serialData[2] = byte(recRed)
 			serialData[3] = byte(recGreen)
 			serialData[4] = byte(recBlue)
-			stripePorts.WriteSerial(serialData)
+			stripePorts.WriteStripe(serialData)
 		}
 		if strings.Contains(bodyStr, "Pulse") {
 			ctx, cancel = context.WithCancel(context.Background())

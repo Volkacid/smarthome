@@ -80,7 +80,7 @@ func (sp *StripePorts) EffectsColorTransition(colorFrom StripeColors, colorTo St
 			pulseData[2] = byte(int(math.Round(tempRed)))
 			pulseData[3] = byte(int(math.Round(tempGreen)))
 			pulseData[4] = byte(int(math.Round(tempBlue)))
-			sp.WriteSerial(pulseData)
+			sp.WriteStripe(pulseData)
 			time.Sleep(delay)
 		}
 	}

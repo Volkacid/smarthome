@@ -23,7 +23,7 @@ func StartUDPService(stripePorts *StripePorts) {
 		switch udpData[0] { //Arduino control byte
 		case 251:
 			ctx, cancel = context.WithCancel(context.Background())
-			stripePorts.WriteSerial(udpData)
+			stripePorts.WriteStripe(udpData)
 			break
 		case 250:
 			ctx, cancel = context.WithCancel(context.Background())
