@@ -142,6 +142,7 @@ func (cp *ControlPorts) GetClimateData() (string, string) {
 	_, hum, _ := strings.Cut(climateNow, "Hum")
 	hum, _, _ = strings.Cut(hum, "Temp")
 	_, temp, _ := strings.Cut(climateNow, "Temp")
+	temp, _, _ = strings.Cut(temp, "\r\n")
 	hum = "Humidity: " + hum + "% "
 	temp = "Temperature: " + temp + "°C"
 	return hum, temp
