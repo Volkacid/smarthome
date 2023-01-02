@@ -93,9 +93,13 @@ func (cp *ControlPorts) StartClimateService() {
 		}
 		cp.climateData = string(buf[:n])
 		hum, temp := cp.GetClimateData()
+		_, hum, _ = strings.Cut(hum, "Humidity: ")
+		hum, _, _ = strings.Cut(hum, "% ")
+		_, temp, _ = strings.Cut(hum, "Temperature: ")
+		temp, _, _ = strings.Cut(hum, "°C")
 		humidity, _ := strconv.ParseFloat(hum, 64)
 		temperature, _ := strconv.ParseFloat(temp, 64)
-		if humidity < 50.0 && !cp.isHumidifierEnabled {
+		if humidity < 40.0 && humidity > 0.0 && !cp.isHumidifierEnabled {
 			cp.WriteControl(CommHumidifierEnable)
 			cp.isHumidifierEnabled = true
 		}
@@ -103,7 +107,7 @@ func (cp *ControlPorts) StartClimateService() {
 			cp.WriteControl(CommHumidifierDisable)
 			cp.isHumidifierEnabled = false
 		}
-		if temperature < 20.0 && !cp.isHeaterEnabled {
+		if temperature < 20.0 && temperature > 0.0 && !cp.isHeaterEnabled {
 			cp.WriteControl(CommHeaterEnable)
 			cp.isHeaterEnabled = true
 		}
@@ -115,7 +119,7 @@ func (cp *ControlPorts) StartClimateService() {
 			cp.WriteControl(CommConditionerEnable)
 			cp.isConditionerEnabled = true
 		}
-		if temperature < 23.0 && cp.isConditionerEnabled {
+		if temperature < 23.0 && temperature > 0.0 && cp.isConditionerEnabled {
 			cp.WriteControl(CommConditionerDisable)
 			cp.isConditionerEnabled = false
 		}
