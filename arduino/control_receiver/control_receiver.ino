@@ -43,11 +43,4 @@ void loop()
     }
     memset(rcv_str, 0, sizeof(rcv_str));
   }
-  /*digitalWrite(relayIn1, HIGH);
-  digitalWrite(relayIn2, HIGH);
-  Serial.println("Enabled");
-  delay(1000);
-  digitalWrite(relayIn1, LOW);
-  digitalWrite(relayIn2, LOW);
-  Serial.println("Disabled");*/
 }

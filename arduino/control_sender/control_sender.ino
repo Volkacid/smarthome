@@ -24,17 +24,6 @@ void loop() {
     if (Serial.readBytes(rcv_str, 3) < 3) return;
       EEBlue.write(rcv_str, 3);
   }
-  /*byte buf[3];
-  buf[0] = 254;
-  buf[2] = 255;
-  EEBlue.write(buf, 3);
-  Serial.println(buf[0]);
-  Serial.println(buf[1]);
-  Serial.println(buf[2]);
-  delay(2000);
-  buf[2] = 254;
-  EEBlue.write(buf, 3);
-  delay(2000);*/
   // Wait a few seconds between measurements.
   if (millis() - timer > 10000) {
     timer = millis();
