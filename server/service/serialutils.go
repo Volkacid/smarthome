@@ -95,33 +95,41 @@ func (cp *ControlPorts) StartClimateService() {
 		hum, temp := cp.GetClimateData()
 		_, hum, _ = strings.Cut(hum, "Humidity: ")
 		hum, _, _ = strings.Cut(hum, "% ")
-		_, temp, _ = strings.Cut(hum, "Temperature: ")
-		temp, _, _ = strings.Cut(hum, "°C")
-		humidity, _ := strconv.ParseFloat(hum, 64)
-		temperature, _ := strconv.ParseFloat(temp, 64)
-		if humidity < 40.0 && humidity > 0.0 && !cp.isHumidifierEnabled {
-			cp.WriteControl(CommHumidifierEnable)
-			cp.isHumidifierEnabled = true
-		}
-		if humidity > 50.0 && cp.isHumidifierEnabled {
-			cp.WriteControl(CommHumidifierDisable)
-			cp.isHumidifierEnabled = false
-		}
-		if temperature < 20.0 && temperature > 0.0 && !cp.isHeaterEnabled {
-			cp.WriteControl(CommHeaterEnable)
-			cp.isHeaterEnabled = true
-		}
-		if temperature > 26.0 && cp.isHeaterEnabled {
-			cp.WriteControl(CommHeaterDisable)
-			cp.isHeaterEnabled = false
-		}
-		if temperature > 27.0 && !cp.isConditionerEnabled {
-			cp.WriteControl(CommConditionerEnable)
-			cp.isConditionerEnabled = true
-		}
-		if temperature < 23.0 && temperature > 0.0 && cp.isConditionerEnabled {
-			cp.WriteControl(CommConditionerDisable)
-			cp.isConditionerEnabled = false
+		_, temp, _ = strings.Cut(temp, "Temperature: ")
+		temp, _, _ = strings.Cut(temp, "°C")
+		humidity, humErr := strconv.ParseFloat(hum, 64)
+		temperature, tempErr := strconv.ParseFloat(temp, 64)
+		if humErr == nil && tempErr == nil {
+			if humidity < 40.0 && humidity > 0.0 && !cp.isHumidifierEnabled {
+				cp.WriteControl(CommHumidifierEnable)
+				cp.isHumidifierEnabled = true
+				fmt.Println("Humidifier enabled")
+			}
+			if humidity > 50.0 && cp.isHumidifierEnabled {
+				cp.WriteControl(CommHumidifierDisable)
+				cp.isHumidifierEnabled = false
+				fmt.Println("Humidifier disabled")
+			}
+			if temperature < 20.0 && temperature > 0.0 && !cp.isHeaterEnabled {
+				cp.WriteControl(CommHeaterEnable)
+				cp.isHeaterEnabled = true
+				fmt.Println("Heater enabled")
+			}
+			if temperature > 26.0 && cp.isHeaterEnabled {
+				cp.WriteControl(CommHeaterDisable)
+				cp.isHeaterEnabled = false
+				fmt.Println("Heater disabled")
+			}
+			if temperature > 27.0 && !cp.isConditionerEnabled {
+				cp.WriteControl(CommConditionerEnable)
+				cp.isConditionerEnabled = true
+				fmt.Println("Conditioner enabled")
+			}
+			if temperature < 23.0 && temperature > 0.0 && cp.isConditionerEnabled {
+				cp.WriteControl(CommConditionerDisable)
+				cp.isConditionerEnabled = false
+				fmt.Println("Conditioner disabled")
+			}
 		}
 	}
 }
