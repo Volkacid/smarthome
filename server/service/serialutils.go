@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"go.bug.st/serial"
+	"strings"
 )
 
 const (
@@ -18,6 +19,7 @@ type StripePorts struct {
 
 type ControlPorts struct {
 	climatePort serial.Port
+	climateData string
 }
 
 func OpenStripePorts() *StripePorts {
@@ -26,7 +28,7 @@ func OpenStripePorts() *StripePorts {
 	if err != nil {
 		fmt.Println("Bed port error: ", err)
 	}
-	tablePort, err := serial.Open("/dev/ttyUSB0", portMode)
+	tablePort, err := serial.Open("/dev/ttyUSB2", portMode)
 	if err != nil {
 		fmt.Println("Table port error: ", err)
 	}
@@ -57,7 +59,7 @@ func (sp *StripePorts) WriteStripe(data []byte) {
 
 func OpenControlPorts() *ControlPorts {
 	portMode := &serial.Mode{BaudRate: 38400}
-	climatePort, err := serial.Open("/dev/ttyUSB2", portMode)
+	climatePort, err := serial.Open("/dev/ttyUSB0", portMode)
 	if err != nil {
 		fmt.Println("Climate port error: ", err)
 	}
@@ -68,7 +70,7 @@ func (cp *ControlPorts) CloseControlPorts() {
 	cp.climatePort.Close()
 }
 
-func (cp *ControlPorts) ReadSerial() {
+func (cp *ControlPorts) StartClimateService(climateData string) {
 	for {
 		buf := make([]byte, 30)
 		n, err := cp.climatePort.Read(buf)
@@ -76,6 +78,20 @@ func (cp *ControlPorts) ReadSerial() {
 			fmt.Println("Climate port reading error: ", err)
 			return
 		}
-		fmt.Println(string(buf[:n]))
+		cp.climateData = string(buf[:n])
+		//fmt.Println(string(buf[:n]))
 	}
+}
+
+func (cp *ControlPorts) GetClimateData() (string, string) {
+	climateNow := cp.climateData
+	if climateNow == "" {
+		return "0", "0"
+	}
+	_, hum, _ := strings.Cut(climateNow, "Hum")
+	hum, _, _ = strings.Cut(hum, "Temp")
+	_, temp, _ := strings.Cut(climateNow, "Temp")
+	hum += "%"
+	temp += "°C"
+	return hum, temp
 }
