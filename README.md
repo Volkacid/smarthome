@@ -22,3 +22,4 @@ Climate control. You can connect these devices:
 - Heater
 
 I recommend use a 5v relay module for these features.
+Please note! Some features are implemented only in the Windows client. However, the main features are also available in the web client.
