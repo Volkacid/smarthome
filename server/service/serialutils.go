@@ -80,6 +80,9 @@ func OpenControlPorts() *ControlPorts {
 }
 
 func (cp *ControlPorts) CloseControlPorts() {
+	cp.WriteControl(CommHeaterDisable)
+	cp.WriteControl(CommConditionerDisable)
+	cp.WriteControl(CommHumidifierDisable)
 	cp.climatePort.Close()
 }
 
