@@ -4,6 +4,19 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO.Ports;
 using System.Reflection;
+//
+//using ModernWpf.Controls;
+using System;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using Windows.Media.Control;
+using Windows.Storage.Streams;
+using WindowsMediaController;
+using static WindowsMediaController.MediaManager;
+using Application = System.Windows.Application;
+using System.Threading.Tasks;
+using System.Drawing;
+using System.IO;
 
 namespace AudioMonitor;
 
@@ -44,6 +57,12 @@ public partial class VisualizerForm : Form
     bool isConnected = false;
     bool manualControl = false;
     bool isSynchonizeActive = false;
+    bool isThumbnailCorrectionActive = false;
+
+    ///
+    private static readonly MediaManager mediaManager = new MediaManager();
+    private static MediaSession? currentSession = null;
+    ///
 
     public VisualizerForm()
     {
@@ -60,6 +79,15 @@ public partial class VisualizerForm : Form
         signalPlot.Plot.YLabel("Spectral Power");
         signalPlot.Plot.XLabel("Frequency (kHz)");
         signalPlot.Refresh();
+
+        mediaManager.OnAnySessionOpened += MediaManager_OnAnySessionOpened;
+        mediaManager.OnAnySessionClosed += MediaManager_OnAnySessionClosed;
+        mediaManager.OnFocusedSessionChanged += MediaManager_OnFocusedSessionChanged;
+        mediaManager.OnAnyPlaybackStateChanged += MediaManager_OnAnyPlaybackStateChanged;
+        mediaManager.OnAnyMediaPropertyChanged += MediaManager_OnAnyMediaPropertyChanged;
+        mediaManager.OnAnyTimelinePropertyChanged += MediaManager_OnAnyTimelinePropertyChanged;
+
+        mediaManager.Start();
     }
 
     private void VisualizerForm_Load(object sender, EventArgs e)
@@ -113,7 +141,7 @@ public partial class VisualizerForm : Form
         double[] fftMag = FftSharp.Transform.FFTpower(paddedAudio);
         Array.Copy(fftMag, FftValues, fftMag.Length);
 
-        if (isConnected)
+        if (isConnected && !isThumbnailCorrectionActive)
         {
             int[] colorsPower = new int[3];
             colorsPower = calculator.FindColors(fftMag, lowColorGain, midColorGain, highColorGain);
@@ -165,11 +193,11 @@ public partial class VisualizerForm : Form
         Color red = Color.FromArgb(255, 192, 192);
         Color green = Color.FromArgb(192, 255, 192);
         Color blue = Color.FromArgb(192, 255, 255);
-        Color[] colorGainSet = new Color[3]; 
+        Color[] colorGainSet = new Color[3];
         scheme = schemeBox.Text.Remove(3);
         for (int i = 0; i < 3; i++)
         {
-            switch (scheme[i]) 
+            switch (scheme[i])
             {
                 case 'R':
                     colorGainSet[i] = red;
@@ -187,7 +215,7 @@ public partial class VisualizerForm : Form
         highGain.BackColor = colorGainSet[2];
     }
 
-    private void connectButton_Click(object sender, EventArgs e)
+    private async void connectButton_Click(object sender, EventArgs e)
     {
         if (connectButton.Text == "Connect")
         {
@@ -204,7 +232,8 @@ public partial class VisualizerForm : Form
             lowColorGain = Int32.Parse(lowGain.Text);
             midColorGain = Int32.Parse(midGain.Text);
             highColorGain = Int32.Parse(highGain.Text);
-        } else
+        }
+        else
         {
             toStripe.WithScheme(scheme, 0, 0, 0, bothStripes, typeStatic);
             connectButton.Text = "Connect";
@@ -213,9 +242,10 @@ public partial class VisualizerForm : Form
             midLabel.Text = "Mid";
             highLabel.Text = "High";
         }
+
     }
 
-    private void BitmapForm_Click(object sender, EventArgs e)
+    private async void BitmapForm_Click(object sender, EventArgs e)
     {
         new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
     }
@@ -231,7 +261,8 @@ public partial class VisualizerForm : Form
             {
                 tableBox.Enabled = true;
             }
-        } else
+        }
+        else
         {
             manualControl = false;
             bedBox.Enabled = false;
@@ -270,7 +301,8 @@ public partial class VisualizerForm : Form
             if (synchronizeCheck.Checked)
             {
                 toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bothStripes, typeOverflow);
-            } else
+            }
+            else
             {
                 toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bedStripe, typeOverflow);
             }
@@ -346,4 +378,114 @@ public partial class VisualizerForm : Form
             toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe, typeStatic);
         }
     }
+
+    /// 
+    private static void MediaManager_OnAnySessionOpened(MediaManager.MediaSession session)
+    {
+        Trace.WriteLine("Session opened");
+    }
+    private static void MediaManager_OnAnySessionClosed(MediaManager.MediaSession session)
+    {
+        Trace.WriteLine("Session closed");
+    }
+
+    private static void MediaManager_OnFocusedSessionChanged(MediaManager.MediaSession mediaSession)
+    {
+        Trace.WriteLine("Focused session chaged");
+    }
+
+    private static void MediaManager_OnAnyPlaybackStateChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionPlaybackInfo args)
+    {
+        Trace.WriteLine("Playback state changed");
+    }
+
+    private void MediaManager_OnAnyMediaPropertyChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionMediaProperties args)
+    {
+        Trace.WriteLine("Media property chaged");
+        if (args.Thumbnail != null)
+        {
+            var thumb = GetThumbnail(args.Thumbnail);
+            Bitmap image = BitmapImage2Bitmap(thumb);
+            int matchPixelCount = 0;
+            int matchRed = 0;
+            int matchGreen = 0;
+            int matchBlue = 0;
+            for (int x = 0; x < image.Width; x++)
+            {
+                for (int y = 0; y < image.Height; y++)
+                {
+                    Color currentPixel = image.GetPixel(x, y);
+                    if ((currentPixel.R + currentPixel.G + currentPixel.B) >= 100)
+                    {
+                        matchPixelCount++;
+                        matchRed += currentPixel.R;
+                        matchGreen += currentPixel.G;
+                        matchBlue += currentPixel.B;
+                    }
+                }
+            }
+            int finalRed = matchRed / matchPixelCount;
+            int finalGreen = matchGreen / matchPixelCount;
+            int finalBlue = matchBlue / matchPixelCount;
+            Color imageDominantColor = Color.FromArgb(finalRed, finalGreen, finalBlue);
+            Trace.WriteLine("Dominant color:");
+            Trace.WriteLine(imageDominantColor);
+            if (isThumbnailCorrectionActive && isConnected)
+            {
+                toStripe.SendUDP(imageDominantColor.R, imageDominantColor.G, imageDominantColor.B, bothStripes, typeStatic);
+            }
+        }
+    }
+
+    private static void MediaManager_OnAnyTimelinePropertyChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionTimelineProperties args)
+    {
+        Trace.WriteLine("Timeline property changed");
+    }
+
+    internal static BitmapImage GetThumbnail(IRandomAccessStreamReference Thumbnail)
+    {
+        var imageStream = Thumbnail.OpenReadAsync().GetAwaiter().GetResult();
+        byte[] fileBytes = new byte[imageStream.Size];
+        using (DataReader reader = new DataReader(imageStream))
+        {
+            reader.LoadAsync((uint)imageStream.Size).GetAwaiter().GetResult();
+            reader.ReadBytes(fileBytes);
+        }
+
+        var image = new BitmapImage();
+        using (var ms = new System.IO.MemoryStream(fileBytes))
+        {
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.StreamSource = ms;
+            image.EndInit();
+        }
+        return image;
+    }
+
+    internal static Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
+    {
+        using (MemoryStream outStream = new MemoryStream())
+        {
+            BitmapEncoder enc = new BmpBitmapEncoder();
+            enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+            enc.Save(outStream);
+            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(outStream);
+
+            return new Bitmap(bitmap);
+        }
+    }
+
+    private void useThumbnailCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (useThumbnailCheckBox.Checked)
+        {
+            isThumbnailCorrectionActive = true;
+        } else
+        {
+            isThumbnailCorrectionActive = false;
+        }
+    }
+
+    ///
 }

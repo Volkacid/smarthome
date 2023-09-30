@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "b4VUuAxalYRnK0NJy/Gywwey00iSfUBTL82cjH9TsRyhHaOMwvRGXQkuUJNtpYRXXmzEt/1jYx+SEorY4lHJ4g==",
+  "dgSpecHash": "XH+vj1mlklUURg26cbt1kFK3JvceKzHhAlKkgnn/ZHZQN4rQHrG80cYhHZ1WXVqaDLV2i7c3/Lggg2A0VyeAEQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\duffe\\Desktop\\smarthome\\audiovisualizer\\LEDVisualizer.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\duffe\\.nuget\\packages\\dubya.windowsmediacontroller\\2.5.1\\dubya.windowsmediacontroller.2.5.1.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\fftsharp\\1.1.5\\fftsharp.1.1.5.nupkg.sha512",
+    "C:\\Users\\duffe\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\7.0.0\\microsoft.extensions.logging.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\microsoft.win32.primitives\\4.3.0\\microsoft.win32.primitives.4.3.0.nupkg.sha512",
@@ -101,7 +103,8 @@
     "C:\\Users\\duffe\\.nuget\\packages\\system.threading.tasks.extensions\\4.3.0\\system.threading.tasks.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\duffe\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
-    "C:\\Users\\duffe\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512"
+    "C:\\Users\\duffe\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
+    "C:\\Users\\duffe\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.22621.29\\microsoft.windows.sdk.net.ref.10.0.22621.29.nupkg.sha512"
   ],
   "logs": []
 }

@@ -78,3 +78,7 @@ C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net6.0-windows\refint
 C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net6.0-windows\LEDVisualizer.pdb
 C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net6.0-windows\LEDVisualizer.genruntimeconfig.cache
 C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net6.0-windows\ref\LEDVisualizer.dll
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\bin\Debug\net6.0-windows\System.Runtime.WindowsRuntime.dll
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\bin\Debug\net6.0-windows\System.Runtime.WindowsRuntime.UI.Xaml.dll
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp3.0\System.Runtime.WindowsRuntime.dll
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp3.0\System.Runtime.WindowsRuntime.UI.Xaml.dll

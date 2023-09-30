@@ -1,0 +1,8 @@
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.csproj.AssemblyReference.cache
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.BitmapVisualizer.resources
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\AudioMonitor.VisualizerForm.resources
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.csproj.GenerateResource.cache
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.AssemblyInfoInputs.cache
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.AssemblyInfo.cs
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net5.0-windows\LEDVisualizer.csproj.CoreCompileInputs.cache

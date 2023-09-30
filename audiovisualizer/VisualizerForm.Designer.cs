@@ -28,429 +28,433 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.connectButton = new System.Windows.Forms.Button();
-            this.schemeBox = new System.Windows.Forms.ComboBox();
-            this.schemeLabel = new System.Windows.Forms.Label();
-            this.highGain = new System.Windows.Forms.TextBox();
-            this.midGain = new System.Windows.Forms.TextBox();
-            this.lowGain = new System.Windows.Forms.TextBox();
-            this.gainLabel = new System.Windows.Forms.Label();
-            this.smoothBox = new System.Windows.Forms.TextBox();
-            this.smoothLabel = new System.Windows.Forms.Label();
-            this.highLabel = new System.Windows.Forms.Label();
-            this.midLabel = new System.Windows.Forms.Label();
-            this.lowLabel = new System.Windows.Forms.Label();
-            this.signalPlot = new ScottPlot.FormsPlot();
-            this.peakLabel = new System.Windows.Forms.Label();
-            this.inputBox = new System.Windows.Forms.ComboBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.label1 = new System.Windows.Forms.Label();
-            this.manualControlBox = new System.Windows.Forms.CheckBox();
-            this.synchronizeCheck = new System.Windows.Forms.CheckBox();
-            this.tableBox = new System.Windows.Forms.GroupBox();
-            this.tableOverflowRadio = new System.Windows.Forms.RadioButton();
-            this.tablePulseRadio = new System.Windows.Forms.RadioButton();
-            this.tableStaticRadio = new System.Windows.Forms.RadioButton();
-            this.bedBox = new System.Windows.Forms.GroupBox();
-            this.bedOverflowRadio = new System.Windows.Forms.RadioButton();
-            this.bedPulseRadio = new System.Windows.Forms.RadioButton();
-            this.bedStaticRadio = new System.Windows.Forms.RadioButton();
-            this.BitmapForm = new System.Windows.Forms.Button();
-            this.timeLabel = new System.Windows.Forms.Label();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.tableBox.SuspendLayout();
-            this.bedBox.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            timer1 = new System.Windows.Forms.Timer(components);
+            tabControl1 = new TabControl();
+            tabPage1 = new TabPage();
+            connectButton = new Button();
+            schemeBox = new ComboBox();
+            schemeLabel = new Label();
+            highGain = new TextBox();
+            midGain = new TextBox();
+            lowGain = new TextBox();
+            gainLabel = new Label();
+            smoothBox = new TextBox();
+            smoothLabel = new Label();
+            highLabel = new Label();
+            midLabel = new Label();
+            lowLabel = new Label();
+            signalPlot = new ScottPlot.FormsPlot();
+            peakLabel = new Label();
+            inputBox = new ComboBox();
+            tabPage2 = new TabPage();
+            useThumbnailCheckBox = new CheckBox();
+            label1 = new Label();
+            manualControlBox = new CheckBox();
+            synchronizeCheck = new CheckBox();
+            tableBox = new GroupBox();
+            tableOverflowRadio = new RadioButton();
+            tablePulseRadio = new RadioButton();
+            tableStaticRadio = new RadioButton();
+            bedBox = new GroupBox();
+            bedOverflowRadio = new RadioButton();
+            bedPulseRadio = new RadioButton();
+            bedStaticRadio = new RadioButton();
+            BitmapForm = new Button();
+            timeLabel = new Label();
+            colorDialog1 = new ColorDialog();
+            tabControl1.SuspendLayout();
+            tabPage1.SuspendLayout();
+            tabPage2.SuspendLayout();
+            tableBox.SuspendLayout();
+            bedBox.SuspendLayout();
+            SuspendLayout();
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 20;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            timer1.Enabled = true;
+            timer1.Interval = 20;
+            timer1.Tick += timer1_Tick;
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(17, 16);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(797, 516);
-            this.tabControl1.TabIndex = 11;
+            tabControl1.Controls.Add(tabPage1);
+            tabControl1.Controls.Add(tabPage2);
+            tabControl1.Location = new Point(20, 20);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(797, 516);
+            tabControl1.TabIndex = 11;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.connectButton);
-            this.tabPage1.Controls.Add(this.schemeBox);
-            this.tabPage1.Controls.Add(this.schemeLabel);
-            this.tabPage1.Controls.Add(this.highGain);
-            this.tabPage1.Controls.Add(this.midGain);
-            this.tabPage1.Controls.Add(this.lowGain);
-            this.tabPage1.Controls.Add(this.gainLabel);
-            this.tabPage1.Controls.Add(this.smoothBox);
-            this.tabPage1.Controls.Add(this.smoothLabel);
-            this.tabPage1.Controls.Add(this.highLabel);
-            this.tabPage1.Controls.Add(this.midLabel);
-            this.tabPage1.Controls.Add(this.lowLabel);
-            this.tabPage1.Controls.Add(this.signalPlot);
-            this.tabPage1.Controls.Add(this.peakLabel);
-            this.tabPage1.Controls.Add(this.inputBox);
-            this.tabPage1.Location = new System.Drawing.Point(4, 34);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(789, 478);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Automatic";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            tabPage1.Controls.Add(connectButton);
+            tabPage1.Controls.Add(schemeBox);
+            tabPage1.Controls.Add(schemeLabel);
+            tabPage1.Controls.Add(highGain);
+            tabPage1.Controls.Add(midGain);
+            tabPage1.Controls.Add(lowGain);
+            tabPage1.Controls.Add(gainLabel);
+            tabPage1.Controls.Add(smoothBox);
+            tabPage1.Controls.Add(smoothLabel);
+            tabPage1.Controls.Add(highLabel);
+            tabPage1.Controls.Add(midLabel);
+            tabPage1.Controls.Add(lowLabel);
+            tabPage1.Controls.Add(signalPlot);
+            tabPage1.Controls.Add(peakLabel);
+            tabPage1.Controls.Add(inputBox);
+            tabPage1.Location = new Point(4, 34);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(789, 478);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "Automatic";
+            tabPage1.UseVisualStyleBackColor = true;
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(270, 12);
-            this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(112, 34);
-            this.connectButton.TabIndex = 25;
-            this.connectButton.Text = "Connect";
-            this.connectButton.UseVisualStyleBackColor = true;
-            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
+            connectButton.Location = new Point(270, 12);
+            connectButton.Name = "connectButton";
+            connectButton.Size = new Size(112, 34);
+            connectButton.TabIndex = 25;
+            connectButton.Text = "Connect";
+            connectButton.UseVisualStyleBackColor = true;
+            connectButton.Click += connectButton_Click;
             // 
             // schemeBox
             // 
-            this.schemeBox.FormattingEnabled = true;
-            this.schemeBox.Items.AddRange(new object[] {
-            "RGB(оранжевый)",
-            "RBG(пурпурный)",
-            "GRB(жёлтый)",
-            "GBR(фиолетовый)",
-            "BRG(голубой)",
-            "BGR(синий)"});
-            this.schemeBox.Location = new System.Drawing.Point(586, 427);
-            this.schemeBox.Name = "schemeBox";
-            this.schemeBox.Size = new System.Drawing.Size(182, 33);
-            this.schemeBox.TabIndex = 24;
-            this.schemeBox.Text = "RGB(оранжевый)";
-            this.schemeBox.SelectedIndexChanged += new System.EventHandler(this.schemeBox_SelectedIndexChanged);
+            schemeBox.FormattingEnabled = true;
+            schemeBox.Items.AddRange(new object[] { "RGB(оранжевый)", "RBG(пурпурный)", "GRB(жёлтый)", "GBR(фиолетовый)", "BRG(голубой)", "BGR(синий)" });
+            schemeBox.Location = new Point(586, 427);
+            schemeBox.Name = "schemeBox";
+            schemeBox.Size = new Size(182, 33);
+            schemeBox.TabIndex = 24;
+            schemeBox.Text = "RGB(оранжевый)";
+            schemeBox.SelectedIndexChanged += schemeBox_SelectedIndexChanged;
             // 
             // schemeLabel
             // 
-            this.schemeLabel.AutoSize = true;
-            this.schemeLabel.Location = new System.Drawing.Point(456, 430);
-            this.schemeLabel.Name = "schemeLabel";
-            this.schemeLabel.Size = new System.Drawing.Size(124, 25);
-            this.schemeLabel.TabIndex = 23;
-            this.schemeLabel.Text = "Color scheme:";
+            schemeLabel.AutoSize = true;
+            schemeLabel.Location = new Point(456, 430);
+            schemeLabel.Name = "schemeLabel";
+            schemeLabel.Size = new Size(124, 25);
+            schemeLabel.TabIndex = 23;
+            schemeLabel.Text = "Color scheme:";
             // 
             // highGain
             // 
-            this.highGain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.highGain.Location = new System.Drawing.Point(364, 427);
-            this.highGain.Name = "highGain";
-            this.highGain.Size = new System.Drawing.Size(31, 31);
-            this.highGain.TabIndex = 22;
-            this.highGain.Text = "4";
-            this.highGain.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            highGain.BackColor = Color.FromArgb(192, 255, 255);
+            highGain.Location = new Point(376, 426);
+            highGain.Name = "highGain";
+            highGain.Size = new Size(31, 31);
+            highGain.TabIndex = 22;
+            highGain.Text = "4";
+            highGain.TextAlign = HorizontalAlignment.Center;
             // 
             // midGain
             // 
-            this.midGain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.midGain.Location = new System.Drawing.Point(327, 427);
-            this.midGain.Name = "midGain";
-            this.midGain.Size = new System.Drawing.Size(31, 31);
-            this.midGain.TabIndex = 21;
-            this.midGain.Text = "4";
-            this.midGain.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            midGain.BackColor = Color.FromArgb(192, 255, 192);
+            midGain.Location = new Point(339, 426);
+            midGain.Name = "midGain";
+            midGain.Size = new Size(31, 31);
+            midGain.TabIndex = 21;
+            midGain.Text = "4";
+            midGain.TextAlign = HorizontalAlignment.Center;
             // 
             // lowGain
             // 
-            this.lowGain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.lowGain.Location = new System.Drawing.Point(291, 427);
-            this.lowGain.Name = "lowGain";
-            this.lowGain.Size = new System.Drawing.Size(31, 31);
-            this.lowGain.TabIndex = 20;
-            this.lowGain.Text = "3";
-            this.lowGain.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            lowGain.BackColor = Color.FromArgb(255, 192, 192);
+            lowGain.Location = new Point(303, 426);
+            lowGain.Name = "lowGain";
+            lowGain.Size = new Size(31, 31);
+            lowGain.TabIndex = 20;
+            lowGain.Text = "3";
+            lowGain.TextAlign = HorizontalAlignment.Center;
             // 
             // gainLabel
             // 
-            this.gainLabel.AutoSize = true;
-            this.gainLabel.Location = new System.Drawing.Point(234, 431);
-            this.gainLabel.Name = "gainLabel";
-            this.gainLabel.Size = new System.Drawing.Size(51, 25);
-            this.gainLabel.TabIndex = 19;
-            this.gainLabel.Text = "Gain:";
+            gainLabel.AutoSize = true;
+            gainLabel.Location = new Point(246, 430);
+            gainLabel.Name = "gainLabel";
+            gainLabel.Size = new Size(51, 25);
+            gainLabel.TabIndex = 19;
+            gainLabel.Text = "Gain:";
             // 
             // smoothBox
             // 
-            this.smoothBox.Location = new System.Drawing.Point(134, 429);
-            this.smoothBox.Name = "smoothBox";
-            this.smoothBox.Size = new System.Drawing.Size(31, 31);
-            this.smoothBox.TabIndex = 18;
-            this.smoothBox.Text = "5";
-            this.smoothBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            smoothBox.Location = new Point(162, 426);
+            smoothBox.Name = "smoothBox";
+            smoothBox.Size = new Size(31, 31);
+            smoothBox.TabIndex = 18;
+            smoothBox.Text = "5";
+            smoothBox.TextAlign = HorizontalAlignment.Center;
             // 
             // smoothLabel
             // 
-            this.smoothLabel.AutoSize = true;
-            this.smoothLabel.Location = new System.Drawing.Point(23, 432);
-            this.smoothLabel.Name = "smoothLabel";
-            this.smoothLabel.Size = new System.Drawing.Size(105, 25);
-            this.smoothLabel.TabIndex = 17;
-            this.smoothLabel.Text = "Smoothing:";
+            smoothLabel.AutoSize = true;
+            smoothLabel.Location = new Point(51, 429);
+            smoothLabel.Name = "smoothLabel";
+            smoothLabel.Size = new Size(105, 25);
+            smoothLabel.TabIndex = 17;
+            smoothLabel.Text = "Smoothing:";
             // 
             // highLabel
             // 
-            this.highLabel.AutoSize = true;
-            this.highLabel.Location = new System.Drawing.Point(709, 16);
-            this.highLabel.Name = "highLabel";
-            this.highLabel.Size = new System.Drawing.Size(50, 25);
-            this.highLabel.TabIndex = 16;
-            this.highLabel.Text = "High";
+            highLabel.AutoSize = true;
+            highLabel.Location = new Point(709, 16);
+            highLabel.Name = "highLabel";
+            highLabel.Size = new Size(50, 25);
+            highLabel.TabIndex = 16;
+            highLabel.Text = "High";
             // 
             // midLabel
             // 
-            this.midLabel.AutoSize = true;
-            this.midLabel.Location = new System.Drawing.Point(644, 16);
-            this.midLabel.Name = "midLabel";
-            this.midLabel.Size = new System.Drawing.Size(43, 25);
-            this.midLabel.TabIndex = 15;
-            this.midLabel.Text = "Mid";
+            midLabel.AutoSize = true;
+            midLabel.Location = new Point(644, 16);
+            midLabel.Name = "midLabel";
+            midLabel.Size = new Size(43, 25);
+            midLabel.TabIndex = 15;
+            midLabel.Text = "Mid";
             // 
             // lowLabel
             // 
-            this.lowLabel.AutoSize = true;
-            this.lowLabel.Location = new System.Drawing.Point(586, 16);
-            this.lowLabel.Name = "lowLabel";
-            this.lowLabel.Size = new System.Drawing.Size(44, 25);
-            this.lowLabel.TabIndex = 14;
-            this.lowLabel.Text = "Low";
+            lowLabel.AutoSize = true;
+            lowLabel.Location = new Point(586, 16);
+            lowLabel.Name = "lowLabel";
+            lowLabel.Size = new Size(44, 25);
+            lowLabel.TabIndex = 14;
+            lowLabel.Text = "Low";
             // 
             // signalPlot
             // 
-            this.signalPlot.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.signalPlot.Location = new System.Drawing.Point(0, 46);
-            this.signalPlot.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.signalPlot.Name = "signalPlot";
-            this.signalPlot.Size = new System.Drawing.Size(783, 378);
-            this.signalPlot.TabIndex = 13;
+            signalPlot.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            signalPlot.Location = new Point(0, 46);
+            signalPlot.Margin = new Padding(6, 5, 6, 5);
+            signalPlot.Name = "signalPlot";
+            signalPlot.Size = new Size(783, 378);
+            signalPlot.TabIndex = 13;
             // 
             // peakLabel
             // 
-            this.peakLabel.AutoSize = true;
-            this.peakLabel.Location = new System.Drawing.Point(387, 16);
-            this.peakLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.peakLabel.Name = "peakLabel";
-            this.peakLabel.Size = new System.Drawing.Size(138, 25);
-            this.peakLabel.TabIndex = 12;
-            this.peakLabel.Text = "Peak Frequency:";
+            peakLabel.AutoSize = true;
+            peakLabel.Location = new Point(387, 16);
+            peakLabel.Margin = new Padding(4, 0, 4, 0);
+            peakLabel.Name = "peakLabel";
+            peakLabel.Size = new Size(138, 25);
+            peakLabel.TabIndex = 12;
+            peakLabel.Text = "Peak Frequency:";
             // 
             // inputBox
             // 
-            this.inputBox.FormattingEnabled = true;
-            this.inputBox.Location = new System.Drawing.Point(23, 13);
-            this.inputBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.inputBox.Name = "inputBox";
-            this.inputBox.Size = new System.Drawing.Size(235, 33);
-            this.inputBox.TabIndex = 11;
-            this.inputBox.SelectedIndexChanged += new System.EventHandler(this.inputBox_SelectedIndexChanged);
+            inputBox.FormattingEnabled = true;
+            inputBox.Location = new Point(23, 13);
+            inputBox.Margin = new Padding(4, 5, 4, 5);
+            inputBox.Name = "inputBox";
+            inputBox.Size = new Size(235, 33);
+            inputBox.TabIndex = 11;
+            inputBox.SelectedIndexChanged += inputBox_SelectedIndexChanged;
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.label1);
-            this.tabPage2.Controls.Add(this.manualControlBox);
-            this.tabPage2.Controls.Add(this.synchronizeCheck);
-            this.tabPage2.Controls.Add(this.tableBox);
-            this.tabPage2.Controls.Add(this.bedBox);
-            this.tabPage2.Controls.Add(this.BitmapForm);
-            this.tabPage2.Controls.Add(this.timeLabel);
-            this.tabPage2.Location = new System.Drawing.Point(4, 34);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(789, 478);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Manual";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            tabPage2.Controls.Add(useThumbnailCheckBox);
+            tabPage2.Controls.Add(label1);
+            tabPage2.Controls.Add(manualControlBox);
+            tabPage2.Controls.Add(synchronizeCheck);
+            tabPage2.Controls.Add(tableBox);
+            tabPage2.Controls.Add(bedBox);
+            tabPage2.Controls.Add(BitmapForm);
+            tabPage2.Controls.Add(timeLabel);
+            tabPage2.Location = new Point(4, 34);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(789, 478);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Manual";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // useThumbnailCheckBox
+            // 
+            useThumbnailCheckBox.AutoSize = true;
+            useThumbnailCheckBox.Location = new Point(437, 279);
+            useThumbnailCheckBox.Name = "useThumbnailCheckBox";
+            useThumbnailCheckBox.Size = new Size(197, 29);
+            useThumbnailCheckBox.TabIndex = 13;
+            useThumbnailCheckBox.Text = "Use song thumbnail";
+            useThumbnailCheckBox.UseVisualStyleBackColor = true;
+            useThumbnailCheckBox.CheckedChanged += useThumbnailCheckBox_CheckedChanged;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(19, 433);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(120, 25);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "Time elapsed:";
+            label1.AutoSize = true;
+            label1.Location = new Point(19, 433);
+            label1.Name = "label1";
+            label1.Size = new Size(120, 25);
+            label1.TabIndex = 12;
+            label1.Text = "Time elapsed:";
             // 
             // manualControlBox
             // 
-            this.manualControlBox.AutoSize = true;
-            this.manualControlBox.Location = new System.Drawing.Point(273, 277);
-            this.manualControlBox.Name = "manualControlBox";
-            this.manualControlBox.Size = new System.Drawing.Size(96, 29);
-            this.manualControlBox.TabIndex = 11;
-            this.manualControlBox.Text = "Manual";
-            this.manualControlBox.UseVisualStyleBackColor = true;
-            this.manualControlBox.CheckedChanged += new System.EventHandler(this.manualControlBox_CheckedChanged);
+            manualControlBox.AutoSize = true;
+            manualControlBox.Location = new Point(147, 279);
+            manualControlBox.Name = "manualControlBox";
+            manualControlBox.Size = new Size(96, 29);
+            manualControlBox.TabIndex = 11;
+            manualControlBox.Text = "Manual";
+            manualControlBox.UseVisualStyleBackColor = true;
+            manualControlBox.CheckedChanged += manualControlBox_CheckedChanged;
             // 
             // synchronizeCheck
             // 
-            this.synchronizeCheck.AutoSize = true;
-            this.synchronizeCheck.Location = new System.Drawing.Point(400, 277);
-            this.synchronizeCheck.Name = "synchronizeCheck";
-            this.synchronizeCheck.Size = new System.Drawing.Size(132, 29);
-            this.synchronizeCheck.TabIndex = 10;
-            this.synchronizeCheck.Text = "Synchronize";
-            this.synchronizeCheck.UseVisualStyleBackColor = true;
-            this.synchronizeCheck.CheckedChanged += new System.EventHandler(this.synchronizeCheck_CheckedChanged);
+            synchronizeCheck.AutoSize = true;
+            synchronizeCheck.Location = new Point(274, 279);
+            synchronizeCheck.Name = "synchronizeCheck";
+            synchronizeCheck.Size = new Size(132, 29);
+            synchronizeCheck.TabIndex = 10;
+            synchronizeCheck.Text = "Synchronize";
+            synchronizeCheck.UseVisualStyleBackColor = true;
+            synchronizeCheck.CheckedChanged += synchronizeCheck_CheckedChanged;
             // 
             // tableBox
             // 
-            this.tableBox.Controls.Add(this.tableOverflowRadio);
-            this.tableBox.Controls.Add(this.tablePulseRadio);
-            this.tableBox.Controls.Add(this.tableStaticRadio);
-            this.tableBox.Enabled = false;
-            this.tableBox.Location = new System.Drawing.Point(400, 88);
-            this.tableBox.Name = "tableBox";
-            this.tableBox.Size = new System.Drawing.Size(370, 167);
-            this.tableBox.TabIndex = 9;
-            this.tableBox.TabStop = false;
-            this.tableBox.Text = "Table";
+            tableBox.Controls.Add(tableOverflowRadio);
+            tableBox.Controls.Add(tablePulseRadio);
+            tableBox.Controls.Add(tableStaticRadio);
+            tableBox.Enabled = false;
+            tableBox.Location = new Point(400, 88);
+            tableBox.Name = "tableBox";
+            tableBox.Size = new Size(370, 167);
+            tableBox.TabIndex = 9;
+            tableBox.TabStop = false;
+            tableBox.Text = "Table";
             // 
             // tableOverflowRadio
             // 
-            this.tableOverflowRadio.AutoSize = true;
-            this.tableOverflowRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.tableOverflowRadio.Checked = true;
-            this.tableOverflowRadio.Location = new System.Drawing.Point(23, 41);
-            this.tableOverflowRadio.Name = "tableOverflowRadio";
-            this.tableOverflowRadio.Size = new System.Drawing.Size(109, 29);
-            this.tableOverflowRadio.TabIndex = 6;
-            this.tableOverflowRadio.TabStop = true;
-            this.tableOverflowRadio.Text = "Overflow";
-            this.tableOverflowRadio.UseVisualStyleBackColor = true;
-            this.tableOverflowRadio.CheckedChanged += new System.EventHandler(this.tableOverflowRadio_CheckedChanged);
+            tableOverflowRadio.AutoSize = true;
+            tableOverflowRadio.CheckAlign = ContentAlignment.MiddleRight;
+            tableOverflowRadio.Checked = true;
+            tableOverflowRadio.Location = new Point(23, 41);
+            tableOverflowRadio.Name = "tableOverflowRadio";
+            tableOverflowRadio.Size = new Size(109, 29);
+            tableOverflowRadio.TabIndex = 6;
+            tableOverflowRadio.TabStop = true;
+            tableOverflowRadio.Text = "Overflow";
+            tableOverflowRadio.UseVisualStyleBackColor = true;
+            tableOverflowRadio.CheckedChanged += tableOverflowRadio_CheckedChanged;
             // 
             // tablePulseRadio
             // 
-            this.tablePulseRadio.AutoSize = true;
-            this.tablePulseRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.tablePulseRadio.Location = new System.Drawing.Point(23, 76);
-            this.tablePulseRadio.Name = "tablePulseRadio";
-            this.tablePulseRadio.Size = new System.Drawing.Size(78, 29);
-            this.tablePulseRadio.TabIndex = 7;
-            this.tablePulseRadio.Text = "Pulse";
-            this.tablePulseRadio.UseVisualStyleBackColor = true;
-            this.tablePulseRadio.CheckedChanged += new System.EventHandler(this.tablePulseRadio_CheckedChanged);
+            tablePulseRadio.AutoSize = true;
+            tablePulseRadio.CheckAlign = ContentAlignment.MiddleRight;
+            tablePulseRadio.Location = new Point(23, 76);
+            tablePulseRadio.Name = "tablePulseRadio";
+            tablePulseRadio.Size = new Size(78, 29);
+            tablePulseRadio.TabIndex = 7;
+            tablePulseRadio.Text = "Pulse";
+            tablePulseRadio.UseVisualStyleBackColor = true;
+            tablePulseRadio.CheckedChanged += tablePulseRadio_CheckedChanged;
             // 
             // tableStaticRadio
             // 
-            this.tableStaticRadio.AutoSize = true;
-            this.tableStaticRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.tableStaticRadio.Location = new System.Drawing.Point(23, 111);
-            this.tableStaticRadio.Name = "tableStaticRadio";
-            this.tableStaticRadio.Size = new System.Drawing.Size(79, 29);
-            this.tableStaticRadio.TabIndex = 8;
-            this.tableStaticRadio.Text = "Static";
-            this.tableStaticRadio.UseVisualStyleBackColor = true;
-            this.tableStaticRadio.CheckedChanged += new System.EventHandler(this.tableStaticRadio_CheckedChanged);
+            tableStaticRadio.AutoSize = true;
+            tableStaticRadio.CheckAlign = ContentAlignment.MiddleRight;
+            tableStaticRadio.Location = new Point(23, 111);
+            tableStaticRadio.Name = "tableStaticRadio";
+            tableStaticRadio.Size = new Size(79, 29);
+            tableStaticRadio.TabIndex = 8;
+            tableStaticRadio.Text = "Static";
+            tableStaticRadio.UseVisualStyleBackColor = true;
+            tableStaticRadio.CheckedChanged += tableStaticRadio_CheckedChanged;
             // 
             // bedBox
             // 
-            this.bedBox.Controls.Add(this.bedOverflowRadio);
-            this.bedBox.Controls.Add(this.bedPulseRadio);
-            this.bedBox.Controls.Add(this.bedStaticRadio);
-            this.bedBox.Enabled = false;
-            this.bedBox.Location = new System.Drawing.Point(19, 88);
-            this.bedBox.Name = "bedBox";
-            this.bedBox.Size = new System.Drawing.Size(350, 167);
-            this.bedBox.TabIndex = 8;
-            this.bedBox.TabStop = false;
-            this.bedBox.Text = "Bed";
+            bedBox.Controls.Add(bedOverflowRadio);
+            bedBox.Controls.Add(bedPulseRadio);
+            bedBox.Controls.Add(bedStaticRadio);
+            bedBox.Enabled = false;
+            bedBox.Location = new Point(19, 88);
+            bedBox.Name = "bedBox";
+            bedBox.Size = new Size(350, 167);
+            bedBox.TabIndex = 8;
+            bedBox.TabStop = false;
+            bedBox.Text = "Bed";
             // 
             // bedOverflowRadio
             // 
-            this.bedOverflowRadio.AutoSize = true;
-            this.bedOverflowRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.bedOverflowRadio.Checked = true;
-            this.bedOverflowRadio.Location = new System.Drawing.Point(18, 41);
-            this.bedOverflowRadio.Name = "bedOverflowRadio";
-            this.bedOverflowRadio.Size = new System.Drawing.Size(109, 29);
-            this.bedOverflowRadio.TabIndex = 3;
-            this.bedOverflowRadio.TabStop = true;
-            this.bedOverflowRadio.Text = "Overflow";
-            this.bedOverflowRadio.UseVisualStyleBackColor = true;
-            this.bedOverflowRadio.CheckedChanged += new System.EventHandler(this.bedOverflowRadio_CheckedChanged);
+            bedOverflowRadio.AutoSize = true;
+            bedOverflowRadio.CheckAlign = ContentAlignment.MiddleRight;
+            bedOverflowRadio.Checked = true;
+            bedOverflowRadio.Location = new Point(18, 41);
+            bedOverflowRadio.Name = "bedOverflowRadio";
+            bedOverflowRadio.Size = new Size(109, 29);
+            bedOverflowRadio.TabIndex = 3;
+            bedOverflowRadio.TabStop = true;
+            bedOverflowRadio.Text = "Overflow";
+            bedOverflowRadio.UseVisualStyleBackColor = true;
+            bedOverflowRadio.CheckedChanged += bedOverflowRadio_CheckedChanged;
             // 
             // bedPulseRadio
             // 
-            this.bedPulseRadio.AutoSize = true;
-            this.bedPulseRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.bedPulseRadio.Location = new System.Drawing.Point(18, 76);
-            this.bedPulseRadio.Name = "bedPulseRadio";
-            this.bedPulseRadio.Size = new System.Drawing.Size(78, 29);
-            this.bedPulseRadio.TabIndex = 4;
-            this.bedPulseRadio.Text = "Pulse";
-            this.bedPulseRadio.UseVisualStyleBackColor = true;
-            this.bedPulseRadio.CheckedChanged += new System.EventHandler(this.bedPulseRadio_CheckedChanged);
+            bedPulseRadio.AutoSize = true;
+            bedPulseRadio.CheckAlign = ContentAlignment.MiddleRight;
+            bedPulseRadio.Location = new Point(18, 76);
+            bedPulseRadio.Name = "bedPulseRadio";
+            bedPulseRadio.Size = new Size(78, 29);
+            bedPulseRadio.TabIndex = 4;
+            bedPulseRadio.Text = "Pulse";
+            bedPulseRadio.UseVisualStyleBackColor = true;
+            bedPulseRadio.CheckedChanged += bedPulseRadio_CheckedChanged;
             // 
             // bedStaticRadio
             // 
-            this.bedStaticRadio.AutoSize = true;
-            this.bedStaticRadio.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.bedStaticRadio.Location = new System.Drawing.Point(18, 111);
-            this.bedStaticRadio.Name = "bedStaticRadio";
-            this.bedStaticRadio.Size = new System.Drawing.Size(79, 29);
-            this.bedStaticRadio.TabIndex = 5;
-            this.bedStaticRadio.Text = "Static";
-            this.bedStaticRadio.UseVisualStyleBackColor = true;
-            this.bedStaticRadio.CheckedChanged += new System.EventHandler(this.bedStaticRadio_CheckedChanged);
+            bedStaticRadio.AutoSize = true;
+            bedStaticRadio.CheckAlign = ContentAlignment.MiddleRight;
+            bedStaticRadio.Location = new Point(18, 111);
+            bedStaticRadio.Name = "bedStaticRadio";
+            bedStaticRadio.Size = new Size(79, 29);
+            bedStaticRadio.TabIndex = 5;
+            bedStaticRadio.Text = "Static";
+            bedStaticRadio.UseVisualStyleBackColor = true;
+            bedStaticRadio.CheckedChanged += bedStaticRadio_CheckedChanged;
             // 
             // BitmapForm
             // 
-            this.BitmapForm.Location = new System.Drawing.Point(615, 429);
-            this.BitmapForm.Name = "BitmapForm";
-            this.BitmapForm.Size = new System.Drawing.Size(155, 34);
-            this.BitmapForm.TabIndex = 7;
-            this.BitmapForm.Text = "Screen capture";
-            this.BitmapForm.UseVisualStyleBackColor = true;
-            this.BitmapForm.Click += new System.EventHandler(this.BitmapForm_Click);
+            BitmapForm.Location = new Point(615, 429);
+            BitmapForm.Name = "BitmapForm";
+            BitmapForm.Size = new Size(155, 34);
+            BitmapForm.TabIndex = 7;
+            BitmapForm.Text = "Screen capture";
+            BitmapForm.UseVisualStyleBackColor = true;
+            BitmapForm.Click += BitmapForm_Click;
             // 
             // timeLabel
             // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(136, 434);
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(59, 25);
-            this.timeLabel.TabIndex = 6;
-            this.timeLabel.Text = "label1";
+            timeLabel.AutoSize = true;
+            timeLabel.Location = new Point(136, 434);
+            timeLabel.Name = "timeLabel";
+            timeLabel.Size = new Size(59, 25);
+            timeLabel.TabIndex = 6;
+            timeLabel.Text = "label1";
             // 
             // VisualizerForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(829, 548);
-            this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Name = "VisualizerForm";
-            this.Text = "Visualizer";
-            this.Load += new System.EventHandler(this.VisualizerForm_Load);
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
-            this.tableBox.ResumeLayout(false);
-            this.tableBox.PerformLayout();
-            this.bedBox.ResumeLayout(false);
-            this.bedBox.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(829, 548);
+            Controls.Add(tabControl1);
+            Margin = new Padding(4, 5, 4, 5);
+            Name = "VisualizerForm";
+            Text = "Visualizer";
+            Load += VisualizerForm_Load;
+            tabControl1.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            tabPage2.ResumeLayout(false);
+            tabPage2.PerformLayout();
+            tableBox.ResumeLayout(false);
+            tableBox.PerformLayout();
+            bedBox.ResumeLayout(false);
+            bedBox.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion
@@ -487,5 +491,6 @@
         private RadioButton tableOverflowRadio;
         private RadioButton tablePulseRadio;
         private RadioButton tableStaticRadio;
+        private CheckBox useThumbnailCheckBox;
     }
 }

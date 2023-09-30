@@ -1,0 +1,1 @@
+C:\Users\duffe\Desktop\smarthome\audiovisualizer\obj\Debug\net6.0-windows7.0\LEDVisualizer.csproj.AssemblyReference.cache
