@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func MainPage(alarmService *service.AlarmClock, climateService *service.ControlPorts) http.HandlerFunc {
+func MainPage(alarmService *service.AlarmClock) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var rgbControl = `
 <p><b>LED stripe settings:</b></p>
@@ -27,10 +27,12 @@ func MainPage(alarmService *service.AlarmClock, climateService *service.ControlP
 		} else {
 			writer.Write([]byte(alarmTime))
 		}
-		var climateDataHead = `<p><b>Climate data:</b></p>`
-		writer.Write([]byte(climateDataHead))
-		hum, temp := climateService.GetClimateData()
-		writer.Write([]byte(hum))
-		writer.Write([]byte(temp))
+		/*
+			var climateDataHead = `<p><b>Climate data:</b></p>`
+			writer.Write([]byte(climateDataHead))
+			hum, temp := climateService.GetClimateData()
+			writer.Write([]byte(hum))
+			writer.Write([]byte(temp))
+		*/
 	}
 }
