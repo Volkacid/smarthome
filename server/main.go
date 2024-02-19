@@ -12,6 +12,7 @@ import (
 
 func main() {
 	bSockets := service.OpenBluetoothSockets()
+	defer bSockets.CloseSockets()
 
 	go service.StartUDPService(bSockets)
 
@@ -31,5 +32,5 @@ func main() {
 		router.Get("/alarm", handlers.AlarmClockPage(alarmService))
 		router.Post("/alarm", handlers.SetAlarm(alarmService, bSockets))
 	})
-	log.Fatal(http.ListenAndServe(":80", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

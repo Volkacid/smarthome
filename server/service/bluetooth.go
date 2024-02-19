@@ -42,6 +42,11 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	return &BluetoothSockets{kitchenDown: fd1, kitchenUp: fd2}
 }
 
+func (b *BluetoothSockets) CloseSockets() {
+	unix.Close(b.kitchenDown)
+	unix.Close(b.kitchenUp)
+}
+
 func (b *BluetoothSockets) WriteStripe(data []byte) {
 	var err error
 
