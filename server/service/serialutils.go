@@ -9,8 +9,8 @@ import (
 
 const (
 	BothStripes = iota
-	BedStripe
-	TableStripe
+	KitchenDownStripe
+	KitchenUpStripe
 )
 
 type StripePorts struct {
@@ -50,11 +50,11 @@ func (sp *StripePorts) WriteStripe(data []byte) {
 		sp.bedPort.Write(data)
 		sp.tablePort.Write(data)
 		return
-	case BedStripe:
+	case KitchenDownStripe:
 		data[1] = byte(0)
 		sp.bedPort.Write(data)
 		return
-	case TableStripe:
+	case KitchenUpStripe:
 		data[1] = byte(0)
 		sp.tablePort.Write(data)
 		return

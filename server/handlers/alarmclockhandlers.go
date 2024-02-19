@@ -76,7 +76,7 @@ func AlarmClockPage(alarmService *service.AlarmClock) http.HandlerFunc {
 	}
 }
 
-func SetAlarm(alarmService *service.AlarmClock, stripePorts *service.StripePorts) http.HandlerFunc {
+func SetAlarm(alarmService *service.AlarmClock, bSockets *service.BluetoothSockets) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		body, _ := io.ReadAll(request.Body)
 		bodyStr := string(body)
@@ -94,7 +94,7 @@ func SetAlarm(alarmService *service.AlarmClock, stripePorts *service.StripePorts
 				return
 			}
 			alarmService.StopAlarmService()
-			*alarmService = *service.StartAlarmService(alHourInt, alMinInt, stripePorts)
+			*alarmService = *service.StartAlarmService(alHourInt, alMinInt, bSockets)
 		}
 		if strings.Contains(bodyStr, "alarmStop") {
 			alarmService.AlHour = 0

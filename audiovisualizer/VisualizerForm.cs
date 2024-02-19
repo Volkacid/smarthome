@@ -17,20 +17,31 @@ using Application = System.Windows.Application;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
+using Microsoft.VisualBasic.Logging;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using NAudio.Wave.Compression;
+using Windows.Media;
 
 namespace AudioMonitor;
 
 public partial class VisualizerForm : Form
 {
     NAudio.Wave.WaveInEvent? Wave;
+    WasapiLoopbackCapture outCapture;
 
     readonly double[] AudioValues;
     readonly double[] FftValues;
+    double fftPeriod;
 
-    readonly int SampleRate = 44100;
-    readonly int BitDepth = 16;
-    readonly int ChannelCount = 1;
-    readonly int BufferMilliseconds = 15; // increase this to increase frequency resolution
+    //readonly int SampleRate = 38400;
+    readonly int SampleRate = 48000;
+    int BitDepth = 16;
+    readonly int ChannelCount = 2; //TODO: set automatically
+    readonly int BufferMilliseconds = 60; // increase this to increase frequency resolution
+    ///
+    bool isOut = true;
+    ///
 
     const int bedStripe = 1;
     const int tableStripe = 2;
@@ -53,6 +64,7 @@ public partial class VisualizerForm : Form
     ColorsCalculator calculator = new ColorsCalculator();
 
     Stopwatch programTime = new Stopwatch();
+    Stopwatch outDataTime = new Stopwatch();
 
     bool isConnected = false;
     bool manualControl = false;
@@ -69,11 +81,12 @@ public partial class VisualizerForm : Form
         InitializeComponent();
 
         AudioValues = new double[SampleRate * BufferMilliseconds / 1000];
+
         double[] paddedAudio = FftSharp.Pad.ZeroPad(AudioValues);
         double[] fftMag = FftSharp.Transform.FFTmagnitude(paddedAudio);
         FftValues = new double[fftMag.Length];
 
-        double fftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, fftMag.Length);
+        fftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, fftMag.Length);
 
         signalPlot.Plot.AddSignal(FftValues, fftPeriod);
         signalPlot.Plot.YLabel("Spectral Power");
@@ -92,47 +105,187 @@ public partial class VisualizerForm : Form
 
     private void VisualizerForm_Load(object sender, EventArgs e)
     {
-        for (int i = 0; i < NAudio.Wave.WaveIn.DeviceCount; i++)
+        if (!isOut)
         {
-            var caps = NAudio.Wave.WaveIn.GetCapabilities(i);
-            inputBox.Items.Add(caps.ProductName);
+            for (int i = 0; i < NAudio.Wave.WaveIn.DeviceCount; i++)
+            {
+                var caps = NAudio.Wave.WaveIn.GetCapabilities(i);
+                inputBox.Items.Add(caps.ProductName);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < NAudio.Wave.WaveOut.DeviceCount; i++)
+            {
+                var caps = NAudio.Wave.WaveOut.GetCapabilities(i);
+                inputBox.Items.Add(caps.ProductName);
+            }
         }
     }
 
     private void inputBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (Wave is not null)
+        if (!isOut)
         {
-            Wave.StopRecording();
-            Wave.Dispose();
+            if (Wave is not null)
+            {
+                Wave.StopRecording();
+                Wave.Dispose();
 
-            for (int i = 0; i < AudioValues.Length; i++)
-                AudioValues[i] = 0;
-            signalPlot.Plot.AxisAuto();
+                for (int i = 0; i < AudioValues.Length; i++)
+                    AudioValues[i] = 0;
+                signalPlot.Plot.AxisAuto();
+            }
+
+            if (inputBox.SelectedIndex == -1)
+                return;
+
+            Wave = new NAudio.Wave.WaveInEvent()
+            {
+                DeviceNumber = inputBox.SelectedIndex,
+                WaveFormat = new NAudio.Wave.WaveFormat(SampleRate, BitDepth, ChannelCount),
+                BufferMilliseconds = BufferMilliseconds
+            };
+
+            Wave.DataAvailable += WaveIn_DataAvailable;
+            Wave.StartRecording();
         }
-
-        if (inputBox.SelectedIndex == -1)
-            return;
-
-        Wave = new NAudio.Wave.WaveInEvent()
+        else
         {
-            DeviceNumber = inputBox.SelectedIndex,
-            WaveFormat = new NAudio.Wave.WaveFormat(SampleRate, BitDepth, ChannelCount),
-            BufferMilliseconds = BufferMilliseconds
-        };
+            if (outCapture is not null)
+            {
+                outCapture.StopRecording();
+                outCapture.Dispose();
 
-        Wave.DataAvailable += WaveIn_DataAvailable;
-        Wave.StartRecording();
+                for (int i = 0; i < AudioValues.Length; i++)
+                    AudioValues[i] = 0;
+                signalPlot.Plot.AxisAuto();
+            }
+
+            outCapture = new WasapiLoopbackCapture();
+            //outCapture.DataAvailable += WaveIn_DataAvailable;
+            outCapture.DataAvailable += (s, a) =>
+            {
+                ToPCM16(a.Buffer, a.BytesRecorded, outCapture.WaveFormat);
+            };
+            BitDepth = outCapture.WaveFormat.BitsPerSample;
+            outCapture.StartRecording();
+
+            Debug.WriteLine(outCapture.WaveFormat.SampleRate);
+            Debug.WriteLine(outCapture.WaveFormat.BitsPerSample);
+            Debug.WriteLine(outCapture.WaveFormat.Channels);
+            Debug.WriteLine(outCapture.WaveFormat.AverageBytesPerSecond);
+        }
 
         signalPlot.Plot.Title(inputBox.SelectedItem.ToString());
     }
 
+    void ToPCM16(byte[] inputBuffer, int length, WaveFormat format)
+    {
+        // Create a WaveStream from the input buffer.
+        using var memStream = new MemoryStream(inputBuffer, 0, length);
+        using var inputStream = new RawSourceWaveStream(memStream, format);
+
+        // Convert the input stream to a WaveProvider in 16bit PCM format with sample rate of 48000 Hz.
+        var convertedPCM = new SampleToWaveProvider16(
+            new WdlResamplingSampleProvider(
+                new WaveToSampleProvider(inputStream),
+                48000)
+            );
+
+        byte[] convertedBuffer = new byte[length];
+
+        using var stream = new MemoryStream();
+        int read;
+
+        // Read the converted WaveProvider into a buffer and turn it into a Stream.
+        while ((read = convertedPCM.Read(convertedBuffer, 0, length)) > 0)
+            stream.Write(convertedBuffer, 0, read);
+
+        byte[] arr = stream.ToArray();
+        for (int i = 0; i < arr.Length / 4; i++)
+        {
+            if (i >= AudioValues.Length)
+            {
+                break;
+            }
+            AudioValues[i] = BitConverter.ToInt16(arr, i * 4);
+        }
+    }
+
     void WaveIn_DataAvailable(object? sender, NAudio.Wave.WaveInEventArgs e)
     {
-        for (int i = 0; i < e.Buffer.Length / 2; i++)
+        /*WaveFormat outf = new NAudio.Wave.WaveFormat(SampleRate, 16, 1);
+        WaveFormat wf = new WaveFormat(outCapture.WaveFormat.SampleRate, 32, outCapture.WaveFormat.Channels);
+        AcmStream resampleStream = new NAudio.Wave.Compression.AcmStream(wf, outf);
+        Debug.WriteLine(e.Buffer.Length);
+        Debug.WriteLine(resampleStream.SourceBuffer.Length);
+        Debug.WriteLine(resampleStream.DestBuffer.Length);
+        Debug.WriteLine(AudioValues.Length);
+
+        System.Buffer.BlockCopy(e.Buffer, 0, resampleStream.SourceBuffer, 0, e.BytesRecorded);
+        int sourceBytesConverted = 0;
+        var convertedBytes = resampleStream.Convert(e.BytesRecorded, out sourceBytesConverted);
+
+        for (int i = 0; i < resampleStream.SourceBuffer.Length; i++)
         {
-            AudioValues[i] = BitConverter.ToInt16(e.Buffer, i * 2);
+            if (resampleStream.SourceBuffer[i] == 0 && resampleStream.SourceBuffer[i+1] == 0)
+            {
+                Debug.WriteLine(i);
+                break;
+            }
         }
+        for (int i = 0; i < resampleStream.DestBuffer.Length; i++)
+        {
+            if (resampleStream.DestBuffer[i] == 0 && resampleStream.DestBuffer[i+1] == 0)
+            {
+                Debug.WriteLine(i);
+                break;
+            }
+        }
+
+        for (int i = 0; i < resampleStream.DestBuffer.Length / 2; i++)
+        {
+            if (i >= AudioValues.Length)
+            {
+                break;
+            }
+            AudioValues[i] = BitConverter.ToInt16(resampleStream.DestBuffer, i * 2);
+        }*/
+
+        /*Debug.WriteLine(e.Buffer.Length);
+        Debug.WriteLine(AudioValues.Length);
+        Debug.WriteLine(outDataTime.Elapsed.Milliseconds);
+        outDataTime.Reset();
+        outDataTime.Start();
+
+        switch (BitDepth)
+        {
+            case 16:
+                for (int i = 0; i < e.Buffer.Length / 2; i++)
+                {
+                    if (i >= AudioValues.Length)
+                    {
+                        break;
+                    }
+                    AudioValues[i] = BitConverter.ToInt16(e.Buffer, i * 2);
+                }
+                break;
+            case 32:
+                for (int i = 0; i < e.Buffer.Length / 8; i++)
+                {
+                    if (i >= AudioValues.Length)
+                    {
+                        break;
+                    }
+                    //AudioValues[i] = BitConverter.ToInt32(e.Buffer, i * 8);
+                    AudioValues[i] = (BitConverter.ToInt32(e.Buffer, i * 8) / 2) + (BitConverter.ToInt32(e.Buffer, i * 8 + 4) / 2);
+                }
+                break;
+            default:
+                Debug.WriteLine("Unknown BitDepth: ", BitDepth);
+                break;
+        }*/
     }
 
     private void timer1_Tick(object sender, EventArgs e)
@@ -169,7 +322,6 @@ public partial class VisualizerForm : Form
             if (fftMag[i] > fftMag[peakIndex])
                 peakIndex = i;
         }
-        double fftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, fftMag.Length);
         double peakFrequency = fftPeriod * peakIndex;
         peakLabel.Text = $"Peak Frequency: {peakFrequency:N0} Hz";
 
@@ -481,7 +633,8 @@ public partial class VisualizerForm : Form
         if (useThumbnailCheckBox.Checked)
         {
             isThumbnailCorrectionActive = true;
-        } else
+        }
+        else
         {
             isThumbnailCorrectionActive = false;
         }

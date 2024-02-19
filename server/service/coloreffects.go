@@ -12,23 +12,23 @@ type StripeColors struct {
 	B int
 }
 
-func (sp *StripePorts) EffectsPulse(pRed int, pGreen int, pBlue int, stripe int, ctx context.Context) {
-	color1 := StripeColors{pRed, pGreen, pBlue}
+func (b *BluetoothSockets) EffectsPulse(pRed, pGreen, pBlue byte, stripe int, ctx context.Context) {
+	color1 := StripeColors{int(pRed), int(pGreen), int(pBlue)}
 	color2 := StripeColors{0, 0, 0}
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			sp.EffectsColorTransition(color1, color2, 50, 200*time.Millisecond, stripe, ctx)
-			sp.EffectsColorTransition(color2, color1, 50, 200*time.Millisecond, stripe, ctx)
+			b.EffectsColorTransition(color1, color2, 50, 200*time.Millisecond, stripe, ctx)
+			b.EffectsColorTransition(color2, color1, 50, 200*time.Millisecond, stripe, ctx)
 		}
 	}
 }
 
-func (sp *StripePorts) EffectsOverflow(oRed int, oGreen int, oBlue int, stripe int, ctx context.Context) {
+func (b *BluetoothSockets) EffectsOverflow(oRed, oGreen, oBlue byte, stripe int, ctx context.Context) {
 	overflowColors := make([]StripeColors, 6)
-	overflowColors[0] = StripeColors{R: oRed, G: oGreen, B: oBlue}
+	overflowColors[0] = StripeColors{R: int(oRed), G: int(oGreen), B: int(oBlue)}
 	overflowColors[1] = StripeColors{50, 250, 250}
 	overflowColors[2] = StripeColors{250, 50, 250}
 	overflowColors[3] = StripeColors{250, 50, 50}
@@ -40,26 +40,26 @@ func (sp *StripePorts) EffectsOverflow(oRed int, oGreen int, oBlue int, stripe i
 		case <-ctx.Done():
 			return
 		default:
-			sp.EffectsColorTransition(overflowColors[0], overflowColors[1], 100, delay, stripe, ctx)
-			sp.EffectsColorTransition(overflowColors[1], overflowColors[2], 100, delay, stripe, ctx)
-			sp.EffectsColorTransition(overflowColors[2], overflowColors[3], 100, delay, stripe, ctx)
-			sp.EffectsColorTransition(overflowColors[3], overflowColors[4], 100, delay, stripe, ctx)
-			sp.EffectsColorTransition(overflowColors[4], overflowColors[5], 100, delay, stripe, ctx)
-			sp.EffectsColorTransition(overflowColors[5], overflowColors[0], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[0], overflowColors[1], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[1], overflowColors[2], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[2], overflowColors[3], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[3], overflowColors[4], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[4], overflowColors[5], 100, delay, stripe, ctx)
+			b.EffectsColorTransition(overflowColors[5], overflowColors[0], 100, delay, stripe, ctx)
 		}
 	}
 }
 
-func (sp *StripePorts) EffectsAlarm(ctx context.Context) {
+func (b *BluetoothSockets) EffectsAlarm(ctx context.Context) {
 	alarmColors := make([]StripeColors, 3)
 	alarmColors[0] = StripeColors{0, 0, 0}
 	alarmColors[1] = StripeColors{255, 255, 0}
 	alarmColors[2] = StripeColors{255, 255, 255}
-	sp.EffectsColorTransition(alarmColors[0], alarmColors[1], 255, 1*time.Second, BothStripes, ctx)
-	sp.EffectsColorTransition(alarmColors[1], alarmColors[2], 255, 1*time.Second, BothStripes, ctx)
+	b.EffectsColorTransition(alarmColors[0], alarmColors[1], 255, 1*time.Second, BothStripes, ctx)
+	b.EffectsColorTransition(alarmColors[1], alarmColors[2], 255, 1*time.Second, BothStripes, ctx)
 }
 
-func (sp *StripePorts) EffectsColorTransition(colorFrom StripeColors, colorTo StripeColors, steps int, delay time.Duration, stripe int, ctx context.Context) {
+func (b *BluetoothSockets) EffectsColorTransition(colorFrom StripeColors, colorTo StripeColors, steps int, delay time.Duration, stripe int, ctx context.Context) {
 	tempRed := float64(colorFrom.R)
 	tempGreen := float64(colorFrom.G)
 	tempBlue := float64(colorFrom.B)
@@ -80,7 +80,7 @@ func (sp *StripePorts) EffectsColorTransition(colorFrom StripeColors, colorTo St
 			pulseData[2] = byte(int(math.Round(tempRed)))
 			pulseData[3] = byte(int(math.Round(tempGreen)))
 			pulseData[4] = byte(int(math.Round(tempBlue)))
-			sp.WriteStripe(pulseData)
+			b.WriteStripe(pulseData)
 			time.Sleep(delay)
 		}
 	}

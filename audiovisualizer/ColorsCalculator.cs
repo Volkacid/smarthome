@@ -10,42 +10,43 @@ public class ColorsCalculator
 {
     public int[] FindColors(double[] fftMag, int lowColorGain, int midColorGain, int highColorGain)
     {
+        int periodDelimeter = fftMag.Length / 83;
         int firstIndex = 0;
         double firstThird = 0;
         //You can change interval(i) to expand or reduce the signal calculation area
-        for (int i = firstIndex; i < 4; i++) // 0-184Hz for i = 0:4
+        for (int i = firstIndex; i < periodDelimeter * 8; i++)
         {
             firstThird += fftMag[i];
             if (fftMag[i] > fftMag[firstIndex])
                 firstIndex = i;
         }
-        firstThird = (firstThird / 4) * lowColorGain;
+        firstThird = (firstThird / periodDelimeter * 8) * lowColorGain;
         if (firstThird < 0) { firstThird = 0; }
         if (firstThird > 255) { firstThird = 255; }
 
-        int secondIndex = 4;
+        int secondIndex = periodDelimeter * 8;
         double secondThird = 0;
         //You can change interval(i) to expand or reduce the signal calculation area
-        for (int i = secondIndex; i < 80; i++) // 185Hz-3kHz for i = 5:80
+        for (int i = secondIndex; i < periodDelimeter * 160; i++)
         {
             secondThird += fftMag[i];
             if (fftMag[i] > fftMag[secondIndex])
                 secondIndex = i;
         }
-        secondThird = (secondThird / 76) * midColorGain;
+        secondThird = (secondThird / periodDelimeter * 160) * midColorGain;
         if (secondThird < 0) { secondThird = 0; }
         if (secondThird > 255) { secondThird = 255; }
 
-        int thirdIndex = 80;
+        int thirdIndex = periodDelimeter * 160;
         double thirdThird = 0;
         //You can change interval(i) to expand or reduce the signal calculation area
-        for (int i = thirdIndex; i < 173; i++) // 3-8kHz for i = 6:173
+        for (int i = thirdIndex; i < periodDelimeter * 346; i++)
         {
             thirdThird += fftMag[i];
             if (fftMag[i] > fftMag[thirdIndex])
                 thirdIndex = i;
         }
-        thirdThird = (thirdThird / 93) * highColorGain;
+        thirdThird = (thirdThird / periodDelimeter * 346) * highColorGain;
         if (thirdThird < 0) { thirdThird = 0; }
         if (thirdThird > 255) { thirdThird = 255; }
 
