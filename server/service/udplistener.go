@@ -32,11 +32,11 @@ func StartUDPService(bSockets *BluetoothSockets) {
 			break
 		case 250:
 			ctx, cancel = context.WithCancel(context.Background())
-			go bSockets.EffectsOverflow(int(udpData[2]), int(udpData[3]), int(udpData[4]), int(udpData[1]), ctx)
+			go bSockets.EffectsOverflow(udpData[2], udpData[3], udpData[4], int(udpData[1]), ctx)
 			break
 		case 249:
 			ctx, cancel = context.WithCancel(context.Background())
-			go bSockets.EffectsPulse(int(udpData[2]), int(udpData[3]), int(udpData[4]), int(udpData[1]), ctx)
+			go bSockets.EffectsPulse(udpData[2], udpData[3], udpData[4], int(udpData[1]), ctx)
 			break
 		}
 	}

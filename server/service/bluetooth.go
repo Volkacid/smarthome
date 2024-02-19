@@ -48,19 +48,19 @@ func (b *BluetoothSockets) WriteStripe(data []byte) {
 	switch data[1] { //Stripe control byte
 	case BothStripes:
 		data[1] = 1
-		_, err = unix.Write(b.fd1, data)
+		_, err = unix.Write(b.kitchenDown, data)
 		util.CheckFatal(err)
-		_, err = unix.Write(b.fd2, data)
+		_, err = unix.Write(b.kitchenUp, data)
 		util.CheckFatal(err)
 		break
 	case KitchenDownStripe:
 		data[1] = 1
-		_, err = unix.Write(b.fd1, data)
+		_, err = unix.Write(b.kitchenDown, data)
 		util.CheckFatal(err)
 		break
 	case KitchenUpStripe:
 		data[1] = 1
-		_, err = unix.Write(b.fd2, data)
+		_, err = unix.Write(b.kitchenUp, data)
 		util.CheckFatal(err)
 		break
 	}
