@@ -32,5 +32,7 @@ func main() {
 		router.Get("/alarm", handlers.AlarmClockPage(alarmService))
 		router.Post("/alarm", handlers.SetAlarm(alarmService, bSockets))
 	})
-	log.Fatal(http.ListenAndServe(":8080", router))
+	addr := ":8080"
+	log.Println("Listening on", addr)
+	log.Fatal(http.ListenAndServe(addr, router))
 }

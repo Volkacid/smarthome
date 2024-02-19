@@ -37,6 +37,14 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	defer unix.Close(fd2)
 	log.Println("fd2 done")
 
+	//
+	data := []byte{255, 1, 250, 250, 250}
+	_, err = unix.Write(fd1, data)
+	util.CheckFatal(err)
+	_, err = unix.Write(fd2, data)
+	util.CheckFatal(err)
+	//
+
 	log.Println("Bluetooth initialized")
 
 	return &BluetoothSockets{kitchenDown: fd1, kitchenUp: fd2}
