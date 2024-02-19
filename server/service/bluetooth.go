@@ -8,8 +8,8 @@ import (
 )
 
 type BluetoothSockets struct {
-	kitchenDown *int
-	kitchenUp   *int
+	kitchenDown int
+	kitchenUp   int
 }
 
 func OpenBluetoothSockets() *BluetoothSockets {
@@ -48,7 +48,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 
 	log.Println("Bluetooth initialized")
 
-	return &BluetoothSockets{kitchenDown: &fd1, kitchenUp: &fd2}
+	return &BluetoothSockets{kitchenDown: fd1, kitchenUp: fd2}
 }
 
 func (b *BluetoothSockets) CloseSockets() {
