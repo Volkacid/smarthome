@@ -25,7 +25,6 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("connecting fd1...")
 	err = unix.Connect(fd1, addr)
 	util.CheckFatal(err)
-	defer unix.Close(fd1)
 	log.Println("fd1 done")
 
 	fd2, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
@@ -34,13 +33,10 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("connecting fd2...")
 	err = unix.Connect(fd2, addr)
 	util.CheckFatal(err)
-	defer unix.Close(fd2)
 	log.Println("fd2 done")
 
 	//
-	log.Println(fd1, fd2)
 	data := []byte{255, 1, 250, 250, 250}
-	log.Printf("%T", fd1)
 	_, err = unix.Write(fd1, data)
 	util.CheckFatal(err)
 	_, err = unix.Write(fd2, data)
@@ -58,9 +54,6 @@ func (b *BluetoothSockets) CloseSockets() {
 }
 
 func (b *BluetoothSockets) WriteStripe(data []byte) {
-	//
-	log.Println(b.kitchenDown, b.kitchenUp)
-	//
 	var err error
 
 	switch data[1] { //Stripe control byte
