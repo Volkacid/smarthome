@@ -39,6 +39,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 
 	//
 	data := []byte{255, 1, 250, 250, 250}
+	log.Printf("%T", fd1)
 	_, err = unix.Write(fd1, data)
 	util.CheckFatal(err)
 	_, err = unix.Write(fd2, data)
