@@ -15,8 +15,8 @@ type BluetoothSockets struct {
 func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("Initializing bluetooth...")
 
-	macKitchenDown := str2ba("98:D3:33:F5:A4:42") // TODO: from config
-	macKitchenUp := str2ba("98:D3:71:F5:ED:A7")
+	macKitchenDown := util.Str2ba("98:D3:33:F5:A4:42") // TODO: from config
+	macKitchenUp := util.Str2ba("98:D3:71:F5:ED:A7")
 
 	log.Println("Creating fd1 socket")
 	fd1, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
