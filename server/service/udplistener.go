@@ -26,7 +26,7 @@ func StartUDPService(bSockets *BluetoothSockets) {
 		fmt.Println("UDP data: ", udpData)
 		cancel()
 		switch udpData[0] { //Arduino control byte
-		case 251:
+		case 255: //TODO: from config
 			ctx, cancel = context.WithCancel(context.Background())
 			bSockets.WriteStripe(udpData)
 			break

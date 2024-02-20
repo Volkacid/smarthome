@@ -46,7 +46,7 @@ public partial class VisualizerForm : Form
     const int bedStripe = 1;
     const int tableStripe = 2;
     const int bothStripes = 0;
-    const int typeStatic = 251;
+    const int typeStatic = 255;
     const int typeOverflow = 250;
     const int typePulse = 249;
 

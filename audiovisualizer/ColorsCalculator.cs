@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,17 +11,49 @@ public class ColorsCalculator
 {
     public int[] FindColors(double[] fftMag, int lowColorGain, int midColorGain, int highColorGain)
     {
-        int periodDelimeter = fftMag.Length / 83;
-        int firstIndex = 0;
-        double firstThird = 0;
-        //You can change interval(i) to expand or reduce the signal calculation area
-        for (int i = firstIndex; i < periodDelimeter * 8; i++)
+        int lowColorMaxPeriod = Convert.ToInt32(fftMag.Length * 0.025);
+        int midColorMaxPeriod = Convert.ToInt32(fftMag.Length * 0.44);
+
+        int lowColorMax = 0;
+        int midColorMax = 0;
+        int highColorMax = 0;
+
+
+        for (int i = 0; i < lowColorMaxPeriod; i++)
         {
-            firstThird += fftMag[i];
-            if (fftMag[i] > fftMag[firstIndex])
-                firstIndex = i;
+            if (fftMag[i] > fftMag[lowColorMax])
+                lowColorMax = Convert.ToInt32(fftMag[i]);
         }
-        firstThird = (firstThird / periodDelimeter * 8) * lowColorGain;
+        lowColorMax = lowColorMax * lowColorGain;
+        if (lowColorMax > 250) {
+            lowColorMax = 250;
+        }
+
+        for (int i = lowColorMaxPeriod; i < midColorMaxPeriod; i++)
+        {
+            if (fftMag[i] > fftMag[midColorMax])
+                midColorMax = Convert.ToInt32(fftMag[i]);
+        }
+        midColorMax = midColorMax * midColorGain;
+        if (midColorMax > 250)
+        {
+            midColorMax = 250;
+        }
+
+        for (int i = midColorMaxPeriod; i < fftMag.Length; i++)
+        {
+            if (fftMag[i] > fftMag[highColorMax])
+                highColorMax = Convert.ToInt32(fftMag[i]);
+        }
+        highColorMax = highColorMax * highColorGain;
+        if (highColorMax > 250)
+        {
+            highColorMax = 250;
+        }
+
+        return new int[] { lowColorMax, midColorMax, highColorMax };
+
+        /*int lowColorPower = (firstThird / periodDelimeter * 8) * lowColorGain;
         if (firstThird < 0) { firstThird = 0; }
         if (firstThird > 255) { firstThird = 255; }
 
@@ -50,6 +83,7 @@ public class ColorsCalculator
         if (thirdThird < 0) { thirdThird = 0; }
         if (thirdThird > 255) { thirdThird = 255; }
 
-        return new int[] { (int)firstThird, (int)secondThird, (int)thirdThird };
+        return new int[] { lowColorPower, (int)secondThird, (int)thirdThird };*/
+
     }
 }

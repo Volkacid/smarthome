@@ -51,7 +51,7 @@ public class StripeWriter
         UdpClient RGBSender = new UdpClient();
 
         //Change this to your UDP listener address
-        IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 47 });
+        IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 8 });
         //IPAddress servAddr = new IPAddress(new byte[] { 127, 0, 0, 1 });
 
         IPEndPoint endPoint = new IPEndPoint(servAddr, 5001);
