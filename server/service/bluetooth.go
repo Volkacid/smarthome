@@ -76,14 +76,10 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	buf := make([]byte, 5)
 	buf[0] = 255
 	buf[1] = 1
-	for i := 0; i < 765; i++ {
-		for j := 2; j < 5; j++ {
-			if buf[j] == 255 {
-				continue
-			}
-			buf[j]++
-		}
-		log.Println(buf)
+	for i := 0; i < 250; i++ {
+		buf[2]++
+		buf[3]++
+		buf[4]++
 		_, _ = unix.Write(fd1, buf)
 	}
 	log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
