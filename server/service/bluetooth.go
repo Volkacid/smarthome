@@ -6,6 +6,7 @@ import (
 	"golang.org/x/sys/unix"
 	"log"
 	"runtime"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -23,22 +24,43 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	macKitchenDown := util.Str2ba("98:D3:33:F5:A4:42") // TODO: from config
 	macKitchenUp := util.Str2ba("98:D3:71:F5:ED:A7")
 
-	log.Println("Creating fd1 socket")
-	fd1, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
-	util.CheckFatal(err)
-	addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 1}
-	log.Println("connecting fd1...")
-	err = unix.Connect(fd1, addr)
-	util.CheckFatal(err)
-	log.Println("fd1 done")
+	var fd1, fd2 int
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
 
-	fd2, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
-	util.CheckFatal(err)
-	addr = &unix.SockaddrRFCOMM{Addr: macKitchenUp, Channel: 1}
-	log.Println("connecting fd2...")
-	err = unix.Connect(fd2, addr)
-	util.CheckFatal(err)
-	log.Println("fd2 done")
+	go func() {
+		var err error
+		log.Println("Creating fd1 socket")
+		defer wg.Done()
+
+		fd1, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
+		util.CheckFatal(err)
+		addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 1}
+
+		log.Println("connecting fd1...")
+		err = unix.Connect(fd1, addr)
+		util.CheckFatal(err)
+
+		log.Println("fd1 done")
+	}()
+
+	go func() {
+		var err error
+		log.Println("Creating fd2 socket")
+		defer wg.Done()
+
+		fd2, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
+		util.CheckFatal(err)
+		addr = &unix.SockaddrRFCOMM{Addr: macKitchenUp, Channel: 1}
+
+		log.Println("connecting fd2...")
+		err = unix.Connect(fd2, addr)
+		util.CheckFatal(err)
+
+		log.Println("fd2 done")
+	}()
+
+	wg.Wait()
 
 	sockets := &BluetoothSockets{
 		kitchenDown:   fd1,
@@ -49,7 +71,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	sockets.QueueReadWorker(context.Background())
 	log.Println("Bluetooth initialized")
 
-	return &BluetoothSockets{kitchenDown: fd1, kitchenDownCh: make(chan []byte, 100), kitchenUp: fd2, kitchenUpCh: make(chan []byte, 100)}
+	return sockets
 }
 
 func (b *BluetoothSockets) CloseSockets() {
