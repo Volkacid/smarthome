@@ -82,7 +82,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 			}
 			buf[j]++
 		}
-		_, _ = unix.Write(fd1, data)
+		_, _ = unix.Write(fd1, buf)
 	}
 	log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
 	///
