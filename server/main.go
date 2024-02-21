@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
+	"net/http/pprof"
+	_ "net/http/pprof"
 )
 
 func main() {
@@ -31,6 +33,11 @@ func main() {
 		router.Post("/", handlers.PostRGB(bSockets, ctx, cancel))
 		router.Get("/alarm", handlers.AlarmClockPage(alarmService))
 		router.Post("/alarm", handlers.SetAlarm(alarmService, bSockets))
+		router.HandleFunc("/debug/pprof/", pprof.Index)
+		router.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		router.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		router.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		router.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	})
 	addr := ":8080"
 	log.Println("Listening on", addr)
