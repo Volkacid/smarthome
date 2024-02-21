@@ -1,15 +1,20 @@
 package service
 
 import (
+	"context"
 	"github.com/Volkacid/smarthome/util"
 	"golang.org/x/sys/unix"
 	"log"
+	"runtime"
 	"syscall"
+	"time"
 )
 
 type BluetoothSockets struct {
-	kitchenDown int
-	kitchenUp   int
+	kitchenDown   int
+	kitchenDownCh chan []byte
+	kitchenUp     int
+	kitchenUpCh   chan []byte
 }
 
 func OpenBluetoothSockets() *BluetoothSockets {
@@ -35,26 +40,116 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	util.CheckFatal(err)
 	log.Println("fd2 done")
 
-	//
-	data := []byte{255, 1, 250, 250, 250}
-	_, err = unix.Write(fd1, data)
-	util.CheckFatal(err)
-	_, err = unix.Write(fd2, data)
-	util.CheckFatal(err)
-	//
-
+	sockets := &BluetoothSockets{
+		kitchenDown:   fd1,
+		kitchenDownCh: make(chan []byte, 100),
+		kitchenUp:     fd2,
+		kitchenUpCh:   make(chan []byte, 100),
+	}
+	sockets.QueueReadWorker(context.Background())
 	log.Println("Bluetooth initialized")
 
-	return &BluetoothSockets{kitchenDown: fd1, kitchenUp: fd2}
+	return &BluetoothSockets{kitchenDown: fd1, kitchenDownCh: make(chan []byte, 100), kitchenUp: fd2, kitchenUpCh: make(chan []byte, 100)}
 }
 
 func (b *BluetoothSockets) CloseSockets() {
 	unix.Close(b.kitchenDown)
+	close(b.kitchenDownCh)
 	unix.Close(b.kitchenUp)
+	close(b.kitchenUpCh)
+}
+
+func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
+	go func() {
+		for {
+			select {
+			case data := <-b.kitchenDownCh:
+				_, err := unix.Write(b.kitchenDown, data)
+				util.CheckFatal(err)
+				break
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case data := <-b.kitchenUpCh:
+				_, err := unix.Write(b.kitchenUp, data)
+				util.CheckFatal(err)
+				break
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	log.Println("Bluetooth queue worker started")
+}
+
+func (b *BluetoothSockets) QueueWrite(data []byte) {
+	switch data[1] { //Stripe index byte
+	case BothStripes:
+		data[1] = 1
+
+		go func() {
+			select {
+			case b.kitchenDownCh <- data:
+				break
+			case <-time.After(2 * time.Second):
+				log.Println("Timeout writing to kitchenDownCh")
+				break
+			}
+		}()
+
+		go func() {
+			select {
+			case b.kitchenUpCh <- data:
+				break
+			case <-time.After(2 * time.Second):
+				log.Println("Timeout writing to kitchenUpCh")
+				break
+			}
+		}()
+
+		break
+	case KitchenDownStripe:
+		data[1] = 1
+
+		go func() {
+			select {
+			case b.kitchenDownCh <- data:
+				break
+			case <-time.After(2 * time.Second):
+				log.Println("Timeout writing to kitchenDownCh")
+				break
+			}
+		}()
+
+		break
+	case KitchenUpStripe:
+		data[1] = 1
+
+		go func() {
+			select {
+			case b.kitchenUpCh <- data:
+				break
+			case <-time.After(2 * time.Second):
+				log.Println("Timeout writing to kitchenUpCh")
+				break
+			}
+		}()
+
+		break
+	}
 }
 
 func (b *BluetoothSockets) WriteStripe(data []byte) {
-	var err error
+	b.QueueWrite(data)
+	log.Printf("STATISTICS: active goroutines - %d", runtime.NumGoroutine())
+	/*var err error
 
 	switch data[1] { //Stripe control byte
 	case BothStripes:
@@ -74,5 +169,5 @@ func (b *BluetoothSockets) WriteStripe(data []byte) {
 		_, err = unix.Write(b.kitchenUp, data)
 		util.CheckFatal(err)
 		break
-	}
+	}*/
 }
