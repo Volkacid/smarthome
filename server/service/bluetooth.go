@@ -72,20 +72,17 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("Bluetooth initialized")
 
 	///
-	startTime := time.Now()
 	buf := make([]byte, 5)
-	largeBuf := make([]byte, 1250)
 	buf[0] = 255
 	buf[1] = 1
 	for i := 0; i < 250; i++ {
 		buf[2]++
 		buf[3]++
 		buf[4]++
-		//_, _ = unix.Write(fd1, buf)
-		largeBuf = append(largeBuf, buf...)
+		startTime := time.Now()
+		_, _ = unix.Write(fd1, buf)
+		log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
 	}
-	_, _ = unix.Write(fd1, largeBuf)
-	log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
 	///
 
 	return sockets
