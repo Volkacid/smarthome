@@ -33,7 +33,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 		log.Println("Creating fd1 socket")
 		defer wg.Done()
 
-		fd1, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
+		fd1, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
 		util.CheckFatal(err)
 		addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 1}
 
@@ -49,9 +49,9 @@ func OpenBluetoothSockets() *BluetoothSockets {
 		log.Println("Creating fd2 socket")
 		defer wg.Done()
 
-		fd2, err := unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
+		fd2, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
 		util.CheckFatal(err)
-		addr = &unix.SockaddrRFCOMM{Addr: macKitchenUp, Channel: 1}
+		addr := &unix.SockaddrRFCOMM{Addr: macKitchenUp, Channel: 1}
 
 		log.Println("connecting fd2...")
 		err = unix.Connect(fd2, addr)
