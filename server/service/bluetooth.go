@@ -66,6 +66,7 @@ func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
 			case data := <-b.kitchenDownCh:
 				_, err := unix.Write(b.kitchenDown, data)
 				util.CheckFatal(err)
+				log.Println("kitchenDown write ok")
 				break
 			case <-ctx.Done():
 				return
@@ -79,6 +80,7 @@ func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
 			case data := <-b.kitchenUpCh:
 				_, err := unix.Write(b.kitchenUp, data)
 				util.CheckFatal(err)
+				log.Println("kitchenUp write ok")
 				break
 			case <-ctx.Done():
 				return
