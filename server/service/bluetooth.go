@@ -79,11 +79,9 @@ func OpenBluetoothSockets() *BluetoothSockets {
 		buf[2]++
 		buf[3]++
 		buf[4]++
-		go func() {
-			startTime := time.Now()
-			_, _ = unix.Write(fd1, buf)
-			log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
-		}()
+		startTime := time.Now()
+		_, _ = unix.Write(fd1, buf)
+		log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
 	}
 	///
 
