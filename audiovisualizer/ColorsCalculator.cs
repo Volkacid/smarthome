@@ -9,32 +9,32 @@ using System.Threading.Tasks;
 //ColorsCalculator calculate the color based on the strength of the signal in the given interval
 public class ColorsCalculator
 {
-    public int[] FindColors(double[] fftMag, int lowColorGain, int midColorGain, int highColorGain)
+    public int[] FindColors(double[] fftMag, double fftPeriod, int lowColorGain, int midColorGain, int highColorGain)
     {
-        int lowColorMaxPeriod = Convert.ToInt32(fftMag.Length * 0.025);
-        int midColorMaxPeriod = Convert.ToInt32(fftMag.Length * 0.44);
+        int lowColorMaxPeriod = Convert.ToInt32(fftMag.Length * (300 / (fftPeriod * fftMag.Length))); //300Hz
+        int midColorMaxPeriod = Convert.ToInt32(fftMag.Length * (1500 / (fftPeriod * fftMag.Length))); //1.5kHz
 
-        int lowColorMax = 0;
-        int midColorMax = 0;
-        int highColorMax = 0;
+        double lowColorCounter = 100;
+        double midColorCounter = 100;
+        double highColorCounter = 100;
 
 
         for (int i = 0; i < lowColorMaxPeriod; i++)
         {
-            if (fftMag[i] > fftMag[lowColorMax])
-                lowColorMax = Convert.ToInt32(fftMag[i]);
+            lowColorCounter += fftMag[i];
         }
-        lowColorMax = lowColorMax * lowColorGain;
+        if (lowColorCounter < 0) { lowColorCounter = 0; }
+        int lowColorMax = Convert.ToInt32(lowColorCounter / lowColorMaxPeriod * lowColorGain);
         if (lowColorMax > 250) {
             lowColorMax = 250;
         }
 
         for (int i = lowColorMaxPeriod; i < midColorMaxPeriod; i++)
         {
-            if (fftMag[i] > fftMag[midColorMax])
-                midColorMax = Convert.ToInt32(fftMag[i]);
+            midColorCounter += fftMag[i];
         }
-        midColorMax = midColorMax * midColorGain;
+        if (midColorCounter < 0) { midColorCounter = 0; }
+        int midColorMax = Convert.ToInt32(midColorCounter / (midColorMaxPeriod - lowColorMaxPeriod) * midColorGain);
         if (midColorMax > 250)
         {
             midColorMax = 250;
@@ -42,10 +42,10 @@ public class ColorsCalculator
 
         for (int i = midColorMaxPeriod; i < fftMag.Length; i++)
         {
-            if (fftMag[i] > fftMag[highColorMax])
-                highColorMax = Convert.ToInt32(fftMag[i]);
+            highColorCounter += fftMag[i];
         }
-        highColorMax = highColorMax * highColorGain;
+        if (highColorCounter < 0) { highColorCounter = 0; }
+        int highColorMax = Convert.ToInt32(highColorCounter / (fftMag.Length - midColorMaxPeriod) * highColorGain);
         if (highColorMax > 250)
         {
             highColorMax = 250;

@@ -38,7 +38,7 @@ public partial class VisualizerForm : Form
     readonly int SampleRate = 48000;
     int BitDepth = 16;
     readonly int ChannelCount = 2; //TODO: set automatically
-    readonly int BufferMilliseconds = 60; // increase this to increase frequency resolution
+    readonly int BufferMilliseconds = 15; // increase this to increase frequency resolution
     ///
     bool isOut = true;
     ///
@@ -88,7 +88,7 @@ public partial class VisualizerForm : Form
 
         fftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, fftMag.Length);
 
-        signalPlot.Plot.AddSignal(FftValues, fftPeriod);
+        signalPlot.Plot.AddSignal(FftValues, fftPeriod * 0.47); //TODO: this multiplier
         signalPlot.Plot.YLabel("Spectral Power");
         signalPlot.Plot.XLabel("Frequency (kHz)");
         signalPlot.Refresh();
@@ -297,7 +297,7 @@ public partial class VisualizerForm : Form
         if (isConnected && !isThumbnailCorrectionActive)
         {
             int[] colorsPower = new int[3];
-            colorsPower = calculator.FindColors(fftMag, lowColorGain, midColorGain, highColorGain);
+            colorsPower = calculator.FindColors(fftMag, fftPeriod, lowColorGain, midColorGain, highColorGain);
             int lowPower = colorsPower[0];
             int midPower = colorsPower[1];
             int highPower = colorsPower[2];
