@@ -72,6 +72,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("Bluetooth initialized")
 
 	///
+	testStartTime := time.Now()
 	buf := make([]byte, 5)
 	buf[0] = 255
 	buf[1] = 1
@@ -86,6 +87,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
+	log.Printf("Test completed: time elapsed - %v", time.Now().Sub(testStartTime))
 	///
 
 	return sockets
