@@ -81,7 +81,9 @@ func OpenBluetoothSockets() *BluetoothSockets {
 		buf[4]++
 		startTime := time.Now()
 		_, _ = unix.Write(fd1, buf)
-		log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
+		if time.Now().Sub(startTime) > time.Millisecond {
+			log.Printf("Test: idex %d time elapsed %v", i, time.Now().Sub(startTime))
+		}
 	}
 	///
 
