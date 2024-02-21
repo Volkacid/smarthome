@@ -132,10 +132,17 @@ func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
 	log.Println("Bluetooth queue worker started")
 }
 
+var writeBuf = make([]byte, 5)
+
 func (b *BluetoothSockets) QueueWrite(data []byte) {
+	if util.SliceEqual(data, writeBuf) { //Remove duplicated commands from streams
+		return
+	}
+	writeBuf = data
+
 	switch data[1] { //Stripe index byte
 	case BothStripes:
-		data[1] = 1
+		data[1] = 1 //Avoiding empty bytes
 
 		go func() {
 			select {
@@ -159,8 +166,6 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 
 		break
 	case KitchenDownStripe:
-		data[1] = 1
-
 		go func() {
 			select {
 			case b.kitchenDownCh <- data:
@@ -173,8 +178,6 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 
 		break
 	case KitchenUpStripe:
-		data[1] = 1
-
 		go func() {
 			select {
 			case b.kitchenUpCh <- data:
