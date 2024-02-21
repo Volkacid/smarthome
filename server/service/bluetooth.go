@@ -35,7 +35,7 @@ func OpenBluetoothSockets() *BluetoothSockets {
 
 		fd1, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
 		util.CheckFatal(err)
-		addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 2}
+		addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 1}
 
 		log.Println("connecting fd1...")
 		err = unix.Connect(fd1, addr)
@@ -70,6 +70,22 @@ func OpenBluetoothSockets() *BluetoothSockets {
 	}
 	sockets.QueueReadWorker(context.Background())
 	log.Println("Bluetooth initialized")
+
+	///
+	startTime := time.Now()
+	for i := 0; i < 1020; i++ {
+		buf := make([]byte, 0)
+		buf[0] = 255
+		for j := 1; j < 5; j++ {
+			if buf[j] == 255 {
+				continue
+			}
+			buf[j]++
+		}
+		_, _ = unix.Write(fd1, data)
+	}
+	log.Printf("Test: time elapsed: %v", time.Now().Sub(startTime))
+	///
 
 	return sockets
 }
