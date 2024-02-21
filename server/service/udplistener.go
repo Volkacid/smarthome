@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"runtime"
 )
 
 func StartUDPService(bSockets *BluetoothSockets) {
@@ -29,6 +30,7 @@ func StartUDPService(bSockets *BluetoothSockets) {
 		case 255: //TODO: from config
 			ctx, cancel = context.WithCancel(context.Background())
 			go bSockets.WriteStripe(udpData)
+			log.Printf("STATISTICS: active goroutines - %d", runtime.NumGoroutine())
 			break
 		case 250:
 			ctx, cancel = context.WithCancel(context.Background())
