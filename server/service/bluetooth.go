@@ -73,9 +73,9 @@ func OpenBluetoothSockets() *BluetoothSockets {
 
 	///
 	startTime := time.Now()
+	buf := make([]byte, 0)
+	buf[0] = 255
 	for i := 0; i < 1020; i++ {
-		buf := make([]byte, 0)
-		buf[0] = 255
 		for j := 1; j < 5; j++ {
 			if buf[j] == 255 {
 				continue
