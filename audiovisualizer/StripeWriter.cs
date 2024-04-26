@@ -52,7 +52,6 @@ public class StripeWriter
 
         //Change this to your UDP listener address
         IPAddress servAddr = new IPAddress(new byte[] { 192, 168, 100, 7 });
-        //IPAddress servAddr = new IPAddress(new byte[] { 127, 0, 0, 1 });
 
         IPEndPoint endPoint = new IPEndPoint(servAddr, 5001);
         RGBSender.Send(buf, buf.Length, endPoint);

@@ -30,7 +30,7 @@ namespace LEDVisualizer
 
         SerialPort _tablePort = new SerialPort();
         //change to your Arduino(BT_receiver_addrLED) port
-        String comTable = "COM3";
+        String comTable = "COM3"; //TODO: scan ports, send ping
 
         public BitmapVisualizer()
         {
@@ -38,7 +38,7 @@ namespace LEDVisualizer
             _tablePort.PortName = comTable;
             _tablePort.BaudRate = 115200;
             _tablePort.DataBits = 8;
-            _tablePort.Open();
+            _tablePort.Open(); //TODO: scan ports, send ping
         }
 
         private async void timer1_Tick(object sender, EventArgs e)

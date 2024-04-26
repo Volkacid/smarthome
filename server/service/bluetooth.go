@@ -5,24 +5,30 @@ import (
 	"github.com/Volkacid/smarthome/util"
 	"golang.org/x/sys/unix"
 	"log"
-	"runtime"
 	"sync"
 	"syscall"
 	"time"
 )
 
 type BluetoothSockets struct {
-	kitchenDown   int
-	kitchenDownCh chan []byte
-	kitchenUp     int
-	kitchenUpCh   chan []byte
+	kitchenDown    int
+	kitchenDownCh  chan []byte
+	kitchenDownMac [6]byte
+	kitchenUp      int
+	kitchenUpCh    chan []byte
+	kitchenUpMac   [6]byte
 }
 
 func OpenBluetoothSockets() *BluetoothSockets {
 	log.Println("Initializing bluetooth...")
+	time.Sleep(5 * time.Second) //Safe reboot delay
 
-	macKitchenDown := util.Str2ba("98:D3:33:F5:A4:42") // TODO: from config
-	macKitchenUp := util.Str2ba("98:D3:71:F5:ED:A7")
+	sockets := &BluetoothSockets{
+		kitchenDownCh:  make(chan []byte, 30),
+		kitchenDownMac: util.Str2ba("98:D3:41:F5:E7:70"), // TODO: from config
+		kitchenUpCh:    make(chan []byte, 30),
+		kitchenUpMac:   util.Str2ba("98:D3:71:F5:ED:A7"), // TODO: from config
+	}
 
 	var fd1, fd2 int
 	wg := &sync.WaitGroup{}
@@ -30,67 +36,84 @@ func OpenBluetoothSockets() *BluetoothSockets {
 
 	go func() {
 		var err error
-		log.Println("Creating fd1 socket")
+		log.Println("Creating kitchenDown socket")
 		defer wg.Done()
 
 		fd1, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
 		util.CheckFatal(err)
-		addr := &unix.SockaddrRFCOMM{Addr: macKitchenDown, Channel: 1}
+		addr := &unix.SockaddrRFCOMM{Addr: sockets.kitchenDownMac, Channel: 1}
 
-		log.Println("connecting fd1...")
+		log.Println("connecting kitchenDown...")
 		err = unix.Connect(fd1, addr)
 		util.CheckFatal(err)
 
-		log.Println("fd1 done")
+		log.Println("kitchenDown done")
 	}()
 
 	go func() {
 		var err error
-		log.Println("Creating fd2 socket")
+		log.Println("Creating kitchenUp socket")
 		defer wg.Done()
 
 		fd2, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
 		util.CheckFatal(err)
-		addr := &unix.SockaddrRFCOMM{Addr: macKitchenUp, Channel: 1}
+		addr := &unix.SockaddrRFCOMM{Addr: sockets.kitchenUpMac, Channel: 1}
 
-		log.Println("connecting fd2...")
+		log.Println("connecting kitchenUp...")
 		err = unix.Connect(fd2, addr)
 		util.CheckFatal(err)
 
-		log.Println("fd2 done")
+		log.Println("kitchenUp done")
 	}()
 
 	wg.Wait()
 
-	sockets := &BluetoothSockets{
-		kitchenDown:   fd1,
-		kitchenDownCh: make(chan []byte, 100),
-		kitchenUp:     fd2,
-		kitchenUpCh:   make(chan []byte, 100),
-	}
-	sockets.QueueReadWorker(context.Background())
+	sockets.kitchenDown = fd1
+	sockets.kitchenUp = fd2
+
+	sockets.queueReadWorker(context.Background())
 	log.Println("Bluetooth initialized")
 
-	///
-	testStartTime := time.Now()
-	buf := make([]byte, 5)
-	buf[0] = 255
-	buf[1] = 1
-	for i := 0; i < 250; i++ {
-		buf[2]++
-		buf[3]++
-		buf[4]++
-		startTime := time.Now()
-		_, _ = unix.Write(fd1, buf)
-		if time.Now().Sub(startTime) > time.Microsecond {
-			log.Printf("Test: idex -  %d time elapsed - %v", i, time.Now().Sub(startTime))
-		}
-		time.Sleep(25 * time.Millisecond)
-	}
-	log.Printf("Test completed: time elapsed - %v", time.Now().Sub(testStartTime))
-	///
-
 	return sockets
+}
+
+func (b *BluetoothSockets) reconnect(fd int, deviceMac [6]byte) {
+	unix.Close(fd)
+
+	var newFd int
+	var err error
+
+	for i := 1; i <= 10; i++ {
+		time.Sleep(5 * time.Second)
+
+		newFd, err = unix.Socket(syscall.AF_BLUETOOTH, syscall.SOCK_STREAM, unix.BTPROTO_RFCOMM)
+		if err != nil {
+			log.Printf("Bluetooth reconnect failed: device - %s, attempt -  %d, err - %s", util.Ba2str(deviceMac), i, err.Error())
+			continue
+		}
+
+		addr := &unix.SockaddrRFCOMM{Addr: deviceMac, Channel: 1}
+		err = unix.Connect(newFd, addr)
+		if err != nil {
+			log.Printf("Bluetooth reconnect failed: device - %s, attempt -  %d, err - %s", util.Ba2str(deviceMac), i, err.Error())
+			continue
+		}
+
+		break
+	}
+
+	if err != nil {
+		log.Fatal("Bluetooth reconnect failed")
+	}
+
+	if deviceMac == b.kitchenDownMac { //TODO: rewrite
+		b.kitchenDown = newFd
+	}
+	if deviceMac == b.kitchenUpMac {
+		b.kitchenUp = newFd
+	}
+
+	log.Printf("Bluetooth reconnect: device - %s reconnected successfully", util.Ba2str(deviceMac))
 }
 
 func (b *BluetoothSockets) CloseSockets() {
@@ -100,14 +123,32 @@ func (b *BluetoothSockets) CloseSockets() {
 	close(b.kitchenUpCh)
 }
 
-func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
+func (b *BluetoothSockets) queueReadWorker(ctx context.Context) {
 	go func() {
+		readBuf := make([]byte, 5)
 		for {
 			select {
 			case data := <-b.kitchenDownCh:
+				if len(b.kitchenDownCh) > 1 { //Begin smoothing if there are problems with connection
+					readBuf = <-b.kitchenDownCh
+					if data[0] == readBuf[0] && data[1] == readBuf[1] {
+						util.AverageColors(data, readBuf)
+					} else { //Sending messages separately if control bytes is different
+						_, err := unix.Write(b.kitchenDown, data)
+						if err != nil {
+							b.reconnect(b.kitchenDown, b.kitchenDownMac)
+						}
+						data = readBuf
+					}
+				}
 				_, err := unix.Write(b.kitchenDown, data)
-				util.CheckFatal(err)
-				log.Println("kitchenDown write ok")
+				if err != nil {
+					b.reconnect(b.kitchenDown, b.kitchenDownMac)
+				}
+
+				if len(b.kitchenDownCh) > 0 {
+					log.Printf("kitchenDownCh len: %d", len(b.kitchenDownCh))
+				}
 				break
 			case <-ctx.Done():
 				return
@@ -116,12 +157,30 @@ func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
 	}()
 
 	go func() {
+		readBuf := make([]byte, 5)
 		for {
 			select {
 			case data := <-b.kitchenUpCh:
+				if len(b.kitchenUpCh) > 1 { //Begin smoothing if there are problems with connection
+					readBuf = <-b.kitchenUpCh
+					if data[0] == readBuf[0] && data[1] == readBuf[1] {
+						util.AverageColors(data, readBuf)
+					} else { //Sending messages separately if control bytes is different
+						_, err := unix.Write(b.kitchenUp, data)
+						if err != nil {
+							b.reconnect(b.kitchenDown, b.kitchenDownMac)
+						}
+						data = readBuf
+					}
+				}
 				_, err := unix.Write(b.kitchenUp, data)
-				util.CheckFatal(err)
-				log.Println("kitchenUp write ok")
+				if err != nil {
+					b.reconnect(b.kitchenUp, b.kitchenUpMac)
+				}
+
+				if len(b.kitchenUpCh) > 0 {
+					log.Printf("kitchenUpCh len: %d", len(b.kitchenUpCh))
+				}
 				break
 			case <-ctx.Done():
 				return
@@ -132,23 +191,22 @@ func (b *BluetoothSockets) QueueReadWorker(ctx context.Context) {
 	log.Println("Bluetooth queue worker started")
 }
 
-var writeBuf = make([]byte, 5)
+//var writeBuf = make([]byte, 5)
 
 func (b *BluetoothSockets) QueueWrite(data []byte) {
-	if util.SliceEqual(data, writeBuf) { //Remove duplicated commands from streams
+	/*if data[0] == EffectSolid && util.SliceEqual(data, writeBuf) { //Remove duplicated commands from streams
 		return
 	}
-	writeBuf = data
+	writeBuf = data*/
 
 	switch data[1] { //Stripe index byte
 	case BothStripes:
-		data[1] = 1 //Avoiding empty bytes
 
 		go func() {
 			select {
 			case b.kitchenDownCh <- data:
 				break
-			case <-time.After(2 * time.Second):
+			case <-time.After(time.Second):
 				log.Println("Timeout writing to kitchenDownCh")
 				break
 			}
@@ -158,7 +216,7 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 			select {
 			case b.kitchenUpCh <- data:
 				break
-			case <-time.After(2 * time.Second):
+			case <-time.After(time.Second):
 				log.Println("Timeout writing to kitchenUpCh")
 				break
 			}
@@ -170,7 +228,7 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 			select {
 			case b.kitchenDownCh <- data:
 				break
-			case <-time.After(2 * time.Second):
+			case <-time.After(time.Second):
 				log.Println("Timeout writing to kitchenDownCh")
 				break
 			}
@@ -182,7 +240,7 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 			select {
 			case b.kitchenUpCh <- data:
 				break
-			case <-time.After(2 * time.Second):
+			case <-time.After(time.Second):
 				log.Println("Timeout writing to kitchenUpCh")
 				break
 			}
@@ -190,30 +248,4 @@ func (b *BluetoothSockets) QueueWrite(data []byte) {
 
 		break
 	}
-}
-
-func (b *BluetoothSockets) WriteStripe(data []byte) {
-	b.QueueWrite(data)
-	log.Printf("STATISTICS: active goroutines - %d", runtime.NumGoroutine())
-	/*var err error
-
-	switch data[1] { //Stripe control byte
-	case BothStripes:
-		data[1] = 1
-		_, err = unix.Write(b.kitchenDown, data)
-		util.CheckFatal(err)
-		_, err = unix.Write(b.kitchenUp, data)
-		util.CheckFatal(err)
-		break
-	case KitchenDownStripe:
-		data[1] = 1
-		_, err = unix.Write(b.kitchenDown, data)
-		util.CheckFatal(err)
-		break
-	case KitchenUpStripe:
-		data[1] = 1
-		_, err = unix.Write(b.kitchenUp, data)
-		util.CheckFatal(err)
-		break
-	}*/
 }

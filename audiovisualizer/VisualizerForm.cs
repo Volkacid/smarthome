@@ -1,33 +1,17 @@
 ﻿using LEDVisualizer;
-using ScottPlot;
 using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.IO.Ports;
-using System.Reflection;
-//
-//using ModernWpf.Controls;
-using System;
-using System.Windows;
 using System.Windows.Media.Imaging;
 using Windows.Media.Control;
 using Windows.Storage.Streams;
 using WindowsMediaController;
-using static WindowsMediaController.MediaManager;
-using Application = System.Windows.Application;
-using System.Threading.Tasks;
-using System.Drawing;
 using System.IO;
-using Microsoft.VisualBasic.Logging;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using NAudio.Wave.Compression;
-using Windows.Media;
 
 namespace AudioMonitor;
 
 public partial class VisualizerForm : Form
 {
-    NAudio.Wave.WaveInEvent? Wave;
     WasapiLoopbackCapture outCapture;
 
     readonly double[] AudioValues;
@@ -39,13 +23,10 @@ public partial class VisualizerForm : Form
     int BitDepth = 16;
     readonly int ChannelCount = 2; //TODO: set automatically
     readonly int BufferMilliseconds = 15; // increase this to increase frequency resolution
-    ///
-    bool isOut = true;
-    ///
 
-    const int bedStripe = 1;
-    const int tableStripe = 2;
-    const int bothStripes = 0;
+    const int allStripes = 0;
+    const int kitchenDownStripe = 1;
+    const int kitchenUpStripe = 2;
     const int typeStatic = 255;
     const int typeOverflow = 250;
     const int typePulse = 249;
@@ -64,17 +45,12 @@ public partial class VisualizerForm : Form
     ColorsCalculator calculator = new ColorsCalculator();
 
     Stopwatch programTime = new Stopwatch();
-    Stopwatch outDataTime = new Stopwatch();
 
     bool isConnected = false;
     bool manualControl = false;
-    bool isSynchonizeActive = false;
-    bool isThumbnailCorrectionActive = false;
+    bool isOtherSettingsActive = false;
 
-    ///
     private static readonly MediaManager mediaManager = new MediaManager();
-    private static MediaSession? currentSession = null;
-    ///
 
     public VisualizerForm()
     {
@@ -93,89 +69,43 @@ public partial class VisualizerForm : Form
         signalPlot.Plot.XLabel("Frequency (kHz)");
         signalPlot.Refresh();
 
-        mediaManager.OnAnySessionOpened += MediaManager_OnAnySessionOpened;
-        mediaManager.OnAnySessionClosed += MediaManager_OnAnySessionClosed;
-        mediaManager.OnFocusedSessionChanged += MediaManager_OnFocusedSessionChanged;
-        mediaManager.OnAnyPlaybackStateChanged += MediaManager_OnAnyPlaybackStateChanged;
         mediaManager.OnAnyMediaPropertyChanged += MediaManager_OnAnyMediaPropertyChanged;
-        mediaManager.OnAnyTimelinePropertyChanged += MediaManager_OnAnyTimelinePropertyChanged;
-
         mediaManager.Start();
     }
 
     private void VisualizerForm_Load(object sender, EventArgs e)
     {
-        if (!isOut)
+        for (int i = 0; i < NAudio.Wave.WaveOut.DeviceCount; i++)
         {
-            for (int i = 0; i < NAudio.Wave.WaveIn.DeviceCount; i++)
-            {
-                var caps = NAudio.Wave.WaveIn.GetCapabilities(i);
-                inputBox.Items.Add(caps.ProductName);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < NAudio.Wave.WaveOut.DeviceCount; i++)
-            {
-                var caps = NAudio.Wave.WaveOut.GetCapabilities(i);
-                inputBox.Items.Add(caps.ProductName);
-            }
+            var caps = NAudio.Wave.WaveOut.GetCapabilities(i);
+            inputBox.Items.Add(caps.ProductName);
         }
     }
 
     private void inputBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (!isOut)
+        if (outCapture is not null)
         {
-            if (Wave is not null)
-            {
-                Wave.StopRecording();
-                Wave.Dispose();
+            outCapture.StopRecording();
+            outCapture.Dispose();
 
-                for (int i = 0; i < AudioValues.Length; i++)
-                    AudioValues[i] = 0;
-                signalPlot.Plot.AxisAuto();
-            }
-
-            if (inputBox.SelectedIndex == -1)
-                return;
-
-            Wave = new NAudio.Wave.WaveInEvent()
-            {
-                DeviceNumber = inputBox.SelectedIndex,
-                WaveFormat = new NAudio.Wave.WaveFormat(SampleRate, BitDepth, ChannelCount),
-                BufferMilliseconds = BufferMilliseconds
-            };
-
-            Wave.DataAvailable += WaveIn_DataAvailable;
-            Wave.StartRecording();
+            for (int i = 0; i < AudioValues.Length; i++)
+                AudioValues[i] = 0;
+            signalPlot.Plot.AxisAuto();
         }
-        else
+
+        outCapture = new WasapiLoopbackCapture();
+        outCapture.DataAvailable += (s, a) =>
         {
-            if (outCapture is not null)
-            {
-                outCapture.StopRecording();
-                outCapture.Dispose();
+            ToPCM16(a.Buffer, a.BytesRecorded, outCapture.WaveFormat);
+        };
+        BitDepth = outCapture.WaveFormat.BitsPerSample;
+        outCapture.StartRecording();
 
-                for (int i = 0; i < AudioValues.Length; i++)
-                    AudioValues[i] = 0;
-                signalPlot.Plot.AxisAuto();
-            }
-
-            outCapture = new WasapiLoopbackCapture();
-            //outCapture.DataAvailable += WaveIn_DataAvailable;
-            outCapture.DataAvailable += (s, a) =>
-            {
-                ToPCM16(a.Buffer, a.BytesRecorded, outCapture.WaveFormat);
-            };
-            BitDepth = outCapture.WaveFormat.BitsPerSample;
-            outCapture.StartRecording();
-
-            Debug.WriteLine(outCapture.WaveFormat.SampleRate);
-            Debug.WriteLine(outCapture.WaveFormat.BitsPerSample);
-            Debug.WriteLine(outCapture.WaveFormat.Channels);
-            Debug.WriteLine(outCapture.WaveFormat.AverageBytesPerSecond);
-        }
+        Debug.WriteLine(outCapture.WaveFormat.SampleRate);
+        Debug.WriteLine(outCapture.WaveFormat.BitsPerSample);
+        Debug.WriteLine(outCapture.WaveFormat.Channels);
+        Debug.WriteLine(outCapture.WaveFormat.AverageBytesPerSecond);
 
         signalPlot.Plot.Title(inputBox.SelectedItem.ToString());
     }
@@ -213,88 +143,13 @@ public partial class VisualizerForm : Form
         }
     }
 
-    void WaveIn_DataAvailable(object? sender, NAudio.Wave.WaveInEventArgs e)
-    {
-        /*WaveFormat outf = new NAudio.Wave.WaveFormat(SampleRate, 16, 1);
-        WaveFormat wf = new WaveFormat(outCapture.WaveFormat.SampleRate, 32, outCapture.WaveFormat.Channels);
-        AcmStream resampleStream = new NAudio.Wave.Compression.AcmStream(wf, outf);
-        Debug.WriteLine(e.Buffer.Length);
-        Debug.WriteLine(resampleStream.SourceBuffer.Length);
-        Debug.WriteLine(resampleStream.DestBuffer.Length);
-        Debug.WriteLine(AudioValues.Length);
-
-        System.Buffer.BlockCopy(e.Buffer, 0, resampleStream.SourceBuffer, 0, e.BytesRecorded);
-        int sourceBytesConverted = 0;
-        var convertedBytes = resampleStream.Convert(e.BytesRecorded, out sourceBytesConverted);
-
-        for (int i = 0; i < resampleStream.SourceBuffer.Length; i++)
-        {
-            if (resampleStream.SourceBuffer[i] == 0 && resampleStream.SourceBuffer[i+1] == 0)
-            {
-                Debug.WriteLine(i);
-                break;
-            }
-        }
-        for (int i = 0; i < resampleStream.DestBuffer.Length; i++)
-        {
-            if (resampleStream.DestBuffer[i] == 0 && resampleStream.DestBuffer[i+1] == 0)
-            {
-                Debug.WriteLine(i);
-                break;
-            }
-        }
-
-        for (int i = 0; i < resampleStream.DestBuffer.Length / 2; i++)
-        {
-            if (i >= AudioValues.Length)
-            {
-                break;
-            }
-            AudioValues[i] = BitConverter.ToInt16(resampleStream.DestBuffer, i * 2);
-        }*/
-
-        /*Debug.WriteLine(e.Buffer.Length);
-        Debug.WriteLine(AudioValues.Length);
-        Debug.WriteLine(outDataTime.Elapsed.Milliseconds);
-        outDataTime.Reset();
-        outDataTime.Start();
-
-        switch (BitDepth)
-        {
-            case 16:
-                for (int i = 0; i < e.Buffer.Length / 2; i++)
-                {
-                    if (i >= AudioValues.Length)
-                    {
-                        break;
-                    }
-                    AudioValues[i] = BitConverter.ToInt16(e.Buffer, i * 2);
-                }
-                break;
-            case 32:
-                for (int i = 0; i < e.Buffer.Length / 8; i++)
-                {
-                    if (i >= AudioValues.Length)
-                    {
-                        break;
-                    }
-                    //AudioValues[i] = BitConverter.ToInt32(e.Buffer, i * 8);
-                    AudioValues[i] = (BitConverter.ToInt32(e.Buffer, i * 8) / 2) + (BitConverter.ToInt32(e.Buffer, i * 8 + 4) / 2);
-                }
-                break;
-            default:
-                Debug.WriteLine("Unknown BitDepth: ", BitDepth);
-                break;
-        }*/
-    }
-
     private void timer1_Tick(object sender, EventArgs e)
     {
         double[] paddedAudio = FftSharp.Pad.ZeroPad(AudioValues);
         double[] fftMag = FftSharp.Transform.FFTpower(paddedAudio);
         Array.Copy(fftMag, FftValues, fftMag.Length);
 
-        if (isConnected && !isThumbnailCorrectionActive)
+        if (isConnected && !isOtherSettingsActive)
         {
             int[] colorsPower = new int[3];
             colorsPower = calculator.FindColors(fftMag, fftPeriod, lowColorGain, midColorGain, highColorGain);
@@ -311,7 +166,7 @@ public partial class VisualizerForm : Form
             highQueue.Enqueue(highPower);
             if (!manualControl)
             {
-                toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), bothStripes, typeStatic);
+                toStripe.WithScheme(scheme, lowQueue.GetAverage(), midQueue.GetAverage(), highQueue.GetAverage(), allStripes, typeStatic);
             }
         }
 
@@ -335,7 +190,6 @@ public partial class VisualizerForm : Form
             yMax: Math.Max(fftPeakMag, signalplotYMax));
 
         signalPlot.RefreshRequest();
-        timeLabel.Text = "" + programTime.Elapsed.Milliseconds;
         programTime.Reset();
         programTime.Start();
     }
@@ -387,169 +241,20 @@ public partial class VisualizerForm : Form
         }
         else
         {
-            toStripe.WithScheme(scheme, 0, 0, 0, bothStripes, typeStatic);
+            toStripe.WithScheme(scheme, 0, 0, 0, allStripes, typeStatic);
             connectButton.Text = "Connect";
             isConnected = false;
             lowLabel.Text = "Low";
             midLabel.Text = "Mid";
             highLabel.Text = "High";
+            Thread.Sleep(500);
+            toStripe.WithScheme(scheme, 0, 0, 0, allStripes, typeStatic); //definitely turn it off
         }
 
-    }
-
-    private async void BitmapForm_Click(object sender, EventArgs e)
-    {
-        new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
-    }
-
-    //manualControl takes control of stripes from automatic mode
-    private void manualControlBox_CheckedChanged(object sender, EventArgs e)
-    {
-        if (manualControlBox.Checked)
-        {
-            manualControl = true;
-            bedBox.Enabled = true;
-            if (!synchronizeCheck.Checked)
-            {
-                tableBox.Enabled = true;
-            }
-        }
-        else
-        {
-            manualControl = false;
-            bedBox.Enabled = false;
-            tableBox.Enabled = false;
-        }
-    }
-
-    //Synchronize option controls both stripes as one
-    private void synchronizeCheck_CheckedChanged(object sender, EventArgs e)
-    {
-        if (synchronizeCheck.Checked)
-        {
-            tableBox.Enabled = false;
-            isSynchonizeActive = true;
-        }
-        else
-        {
-            isSynchonizeActive = false;
-            if (manualControlBox.Checked)
-            {
-                tableBox.Enabled = true;
-            }
-        }
     }
 
     //Effects for manual control
-
-    private void bedOverflowRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (bedOverflowRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            if (synchronizeCheck.Checked)
-            {
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bothStripes, typeOverflow);
-            }
-            else
-            {
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bedStripe, typeOverflow);
-            }
-        }
-    }
-
-    private void bedPulseRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (bedPulseRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            if (synchronizeCheck.Checked)
-            {
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bothStripes, typePulse);
-            }
-            else
-            {
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bedStripe, typeOverflow);
-            }
-        }
-    }
-
-    private void bedStaticRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (bedStaticRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            if (isSynchonizeActive)
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bothStripes, typeStatic);
-            else
-                toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, bedStripe, typeStatic);
-        }
-    }
-
-    private void tableOverflowRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (tableOverflowRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe, typeOverflow);
-        }
-    }
-
-    private void tablePulseRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (tablePulseRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe, typePulse);
-        }
-    }
-
-    private void tableStaticRadio_CheckedChanged(object sender, EventArgs e)
-    {
-        if (tableStaticRadio.Checked && manualControl)
-        {
-            colorDialog1.FullOpen = true;
-            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            Color dialogColor = colorDialog1.Color;
-            toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, tableStripe, typeStatic);
-        }
-    }
-
-    /// 
-    private static void MediaManager_OnAnySessionOpened(MediaManager.MediaSession session)
-    {
-        Trace.WriteLine("Session opened");
-    }
-    private static void MediaManager_OnAnySessionClosed(MediaManager.MediaSession session)
-    {
-        Trace.WriteLine("Session closed");
-    }
-
-    private static void MediaManager_OnFocusedSessionChanged(MediaManager.MediaSession mediaSession)
-    {
-        Trace.WriteLine("Focused session chaged");
-    }
-
-    private static void MediaManager_OnAnyPlaybackStateChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionPlaybackInfo args)
-    {
-        Trace.WriteLine("Playback state changed");
-    }
+    bool isThumbnailCorrectionActive = false;
 
     private void MediaManager_OnAnyMediaPropertyChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionMediaProperties args)
     {
@@ -582,16 +287,11 @@ public partial class VisualizerForm : Form
             Color imageDominantColor = Color.FromArgb(finalRed, finalGreen, finalBlue);
             Trace.WriteLine("Dominant color:");
             Trace.WriteLine(imageDominantColor);
-            if (isThumbnailCorrectionActive && isConnected)
+            if (isThumbnailCorrectionActive && isConnected && isOtherSettingsActive)
             {
-                toStripe.SendUDP(imageDominantColor.R, imageDominantColor.G, imageDominantColor.B, bothStripes, typeStatic);
+                toStripe.SendUDP(imageDominantColor.R, imageDominantColor.G, imageDominantColor.B, allStripes, typeStatic);
             }
         }
-    }
-
-    private static void MediaManager_OnAnyTimelinePropertyChanged(MediaManager.MediaSession sender, GlobalSystemMediaTransportControlsSessionTimelineProperties args)
-    {
-        Trace.WriteLine("Timeline property changed");
     }
 
     internal static BitmapImage GetThumbnail(IRandomAccessStreamReference Thumbnail)
@@ -628,17 +328,43 @@ public partial class VisualizerForm : Form
         }
     }
 
-    private void useThumbnailCheckBox_CheckedChanged(object sender, EventArgs e)
+    private void settingsThumbnailBtn_CheckedChanged(object sender, EventArgs e)
     {
-        if (useThumbnailCheckBox.Checked)
-        {
-            isThumbnailCorrectionActive = true;
-        }
-        else
-        {
-            isThumbnailCorrectionActive = false;
-        }
+        if (!isConnected) { return; }
+
+        isThumbnailCorrectionActive = true;
+        isOtherSettingsActive = true;
+        isDominantColorCorrectionActive = false;
     }
 
-    ///
+    bool isDominantColorCorrectionActive = false;
+
+    private void settingsDominantBtn_CheckedChanged(object sender, EventArgs e)
+    {
+        if (!isConnected) { return; }
+
+        isThumbnailCorrectionActive = false;
+        isOtherSettingsActive = true;
+        isDominantColorCorrectionActive = true;
+
+        colorDialog1.FullOpen = true;
+        if (colorDialog1.ShowDialog() == DialogResult.Cancel) {
+            colorDialog1.Reset();
+            return; 
+        }
+        Color dialogColor = colorDialog1.Color;
+        toStripe.SendUDP(dialogColor.R, dialogColor.G, dialogColor.B, allStripes, typeStatic);
+    }
+
+    private void settingsNoneBtn_CheckedChanged(object sender, EventArgs e)
+    {
+        isThumbnailCorrectionActive = false;
+        isOtherSettingsActive = false;
+        isDominantColorCorrectionActive = false;
+    }
+
+    private void BitmapForm_Click(object sender, EventArgs e)
+    {
+        new Thread(() => new BitmapVisualizer().ShowDialog()).Start();
+    }
 }

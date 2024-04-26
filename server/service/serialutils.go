@@ -13,6 +13,13 @@ const (
 	KitchenUpStripe
 )
 
+const (
+	EffectSolid    = 255
+	EffectRainbow  = 254
+	EffectOverflow = 252
+	EffectPulse    = 251
+)
+
 type StripePorts struct {
 	bedPort   serial.Port
 	tablePort serial.Port

@@ -26,6 +26,19 @@ func (b *BluetoothSockets) EffectsPulse(pRed, pGreen, pBlue byte, stripe int, ct
 	}
 }
 
+func (b *BluetoothSockets) EffectsRainbow(stripe byte, ctx context.Context) {
+	data := []byte{EffectRainbow, stripe, 1, 0, 0} //1 second duration
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			b.QueueWrite(data)
+			time.Sleep(time.Duration(data[2]) * time.Second)
+		}
+	}
+}
+
 func (b *BluetoothSockets) EffectsOverflow(oRed, oGreen, oBlue byte, stripe int, ctx context.Context) {
 	overflowColors := make([]StripeColors, 6)
 	overflowColors[0] = StripeColors{R: int(oRed), G: int(oGreen), B: int(oBlue)}
@@ -75,12 +88,12 @@ func (b *BluetoothSockets) EffectsColorTransition(colorFrom StripeColors, colorT
 			tempBlue -= stepBlue
 			tempGreen -= stepGreen
 			pulseData := make([]byte, 5)
-			pulseData[0] = byte(251) //Arduino control byte
+			pulseData[0] = EffectSolid //Arduino control byte
 			pulseData[1] = byte(stripe)
 			pulseData[2] = byte(int(math.Round(tempRed)))
 			pulseData[3] = byte(int(math.Round(tempGreen)))
 			pulseData[4] = byte(int(math.Round(tempBlue)))
-			b.WriteStripe(pulseData)
+			b.QueueWrite(pulseData)
 			time.Sleep(delay)
 		}
 	}

@@ -26,15 +26,19 @@ func StartUDPService(bSockets *BluetoothSockets) {
 		fmt.Println("UDP data: ", udpData)
 		cancel()
 		switch udpData[0] { //Arduino control byte
-		case 255: //TODO: from config
+		case EffectSolid: //TODO: from config
 			ctx, cancel = context.WithCancel(context.Background())
-			bSockets.WriteStripe(udpData)
+			bSockets.QueueWrite(udpData)
 			break
-		case 250:
+		case EffectRainbow: //TODO: from config
+			ctx, cancel = context.WithCancel(context.Background())
+			go bSockets.EffectsRainbow(BothStripes, ctx)
+			break
+		case EffectOverflow:
 			ctx, cancel = context.WithCancel(context.Background())
 			go bSockets.EffectsOverflow(udpData[2], udpData[3], udpData[4], int(udpData[1]), ctx)
 			break
-		case 249:
+		case EffectPulse:
 			ctx, cancel = context.WithCancel(context.Background())
 			go bSockets.EffectsPulse(udpData[2], udpData[3], udpData[4], int(udpData[1]), ctx)
 			break

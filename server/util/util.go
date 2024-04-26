@@ -25,6 +25,12 @@ func Str2ba(addr string) [6]byte {
 	return b
 }
 
+// Ba2str converts MAC address little-endian byte array to string representation
+func Ba2str(addr [6]byte) string {
+	return fmt.Sprintf("%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+		addr[5], addr[4], addr[3], addr[2], addr[1], addr[0])
+}
+
 func stackTrace(skip int) string {
 	var str strings.Builder
 	for ; ; skip++ {
@@ -52,4 +58,10 @@ func SliceEqual(a, b []byte) bool {
 		}
 	}
 	return true
+}
+
+func AverageColors(a, b []byte) {
+	a[2] = (a[2] / 2) + (b[2] / 2)
+	a[3] = (a[3] / 2) + (b[3] / 2)
+	a[4] = (a[4] / 2) + (b[4] / 2)
 }

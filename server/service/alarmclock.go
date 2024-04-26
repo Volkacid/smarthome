@@ -27,7 +27,7 @@ func (ac *AlarmClock) StopAlarmService() {
 	ac.cancel()
 	data := make([]byte, 5)
 	data[0] = 251
-	ac.sockets.WriteStripe(data)
+	ac.sockets.QueueWrite(data)
 }
 
 func (ac *AlarmClock) timeChecker() {
